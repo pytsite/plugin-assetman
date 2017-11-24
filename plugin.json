@@ -1,0 +1,19 @@
+{
+  "name": "assetman",
+  "version": "1.0",
+  "description": {
+    "en": "Assetman",
+    "ru": "Assetman",
+    "uk": "Assetman"
+  },
+  "url": "https://github.com/pytsite/plugin-assetman",
+  "author": {
+    "name": "Alexander Shepetko",
+    "email": "a@shepetko.com",
+    "url": "https://shepetko.com"
+  },
+  "requires": {
+    "packages": [],
+    "plugins": []
+  }
+}

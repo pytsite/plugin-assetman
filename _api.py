@@ -424,7 +424,7 @@ def check_setup() -> bool:
     return len(r.stdout.decode('utf-8').split('\n')) - 1 >= len(_REQUIRED_NPM_PACKAGES)
 
 
-def npm_setup():
+def setup():
     """Setup NPM environment
     """
     cwd = _getcwd()

@@ -6,8 +6,8 @@ from pytsite import reg as _reg
 from . import _error as error
 from ._api import register_package, library, preload, remove, dump_js, dump_css, url, add_inline, dump_inline, \
     get_urls, get_locations, reset, detect_collection, build, build_translations, build_all, is_package_registered, \
-    register_global, t_browserify, t_copy, t_copy_static, t_less, t_js, t_css, js_module, npm_setup, get_src_dir_path, \
-    get_dst_dir_path, check_setup, npm_update, on_split_location
+    register_global, t_browserify, t_copy, t_copy_static, t_less, t_js, t_css, js_module, get_src_dir_path, \
+    get_dst_dir_path, npm_update, on_split_location
 
 __author__ = 'Alexander Shepetko'
 __email__ = 'a@shepetko.com'
@@ -17,14 +17,12 @@ __license__ = 'MIT'
 _reg.put('paths.assets', _path.join(_reg.get('paths.static'), 'assets'))
 
 
-def _init():
-    from pytsite import console, lang, tpl, router, plugman, setup as pytsite_setup, update as pytsite_update
+def plugin_load():
+    from pytsite import console, lang, tpl, router, plugman, update as pytsite_update
     from . import _console_commands, _api, _eh
 
     # Language
     lang.register_package(__name__)
-
-    # Do this here to avoid cyclic dependency
 
     # Console commands
     console.register_command(_console_commands.Build())
@@ -32,8 +30,6 @@ def _init():
     # Event handlers
     router.on_dispatch(reset, -999, '*')
     router.on_xhr_dispatch(reset, -999, '*')
-    pytsite_setup.on_setup(npm_setup)
-    pytsite_setup.on_setup(build_all, 500)  # Before plugins install
     pytsite_update.on_update_stage_1(npm_update)
     pytsite_update.on_update_after(build_all)
     pytsite_update.on_update_after(build_translations)
@@ -61,4 +57,8 @@ def _init():
     preload(__name__ + '@require-config.js', True, head=True)
 
 
-_init()
+def plugin_install():
+    from . import _api
+
+    if not _api.check_setup():
+        _api.setup()

@@ -465,8 +465,11 @@ def npm_update():
 
 
 def _add_task(location: str, task_name: str, dst: str = '', **kwargs):
-    """Add a transformation task.
+    """Add a transformation task
     """
+    if '@' not in location and location.startswith('plugins.'):
+        location += '@**'
+
     pkg_name, src = _split_location(location)
     src = _path.join(get_src_dir_path(pkg_name), src)
     dst = _path.join(get_dst_dir_path(pkg_name), dst)
@@ -475,13 +478,13 @@ def _add_task(location: str, task_name: str, dst: str = '', **kwargs):
 
 
 def t_copy(location: str, target: str = ''):
-    """Add a location to the copy task.
+    """Add a location to the copy task
     """
     _add_task(location, 'copy', target)
 
 
 def t_copy_static(location: str, target: str = ''):
-    """Add a location to the copy_static task.
+    """Add a location to the copy_static task
     """
     _add_task(location, 'copy_static', target)
 

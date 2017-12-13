@@ -1,11 +1,11 @@
 """PytSite Assetman Plugin Events Handlers
 """
-from pytsite import lang as _lang
-from . import _api
-
 __author__ = 'Alexander Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
+
+from pytsite import lang as _lang
+from . import _api
 
 
 def plugman_install(name: str, version: str):

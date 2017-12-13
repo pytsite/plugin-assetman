@@ -693,13 +693,13 @@ def build_all():
 def on_split_location(handler, priority: int = 0):
     """Shortcut
     """
-    _events.listen('assetman.split_location', handler, priority)
+    _events.listen('assetman@split_location', handler, priority)
 
 
 def _split_location(location: str) -> _Tuple[str, str]:
     """Split asset path into package name and asset path
     """
-    for r in _events.fire('assetman.split_location', location=location):
+    for r in _events.fire('assetman@split_location', location=location):
         location = r
 
     package_name, assets_path = location.split('@')[:2]

@@ -70,4 +70,7 @@ def plugin_install():
     from . import _api
 
     if not _api.check_setup():
+        from pytsite import lang
+
+        lang.register_package(__name__)
         _api.setup()

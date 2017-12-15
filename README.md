@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.2.2 (2017-12-15)
+
+Installation code fixed.
+
+
 ### 1.2.1 (2017-12-13)
 
 Events names fixed.

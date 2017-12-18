@@ -702,6 +702,6 @@ def _split_location(location: str) -> _Tuple[str, str]:
     for r in _events.fire('assetman@split_location', location=location):
         location = r
 
-    package_name, assets_path = location.split('@')[:2]
+    package_name, assets_path = location.split('@')[:2] if '@' in location else ['app', location]
 
     return resolve_package_name(package_name), assets_path

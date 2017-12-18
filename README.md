@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.2.3 (2017-12-18)
+
+Location string splitting fixed.
+
+
 ### 1.2.2 (2017-12-15)
 
 Installation code fixed.

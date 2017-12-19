@@ -17,8 +17,8 @@ if _plugman.is_installed(__name__):
 
 def plugin_load():
     from os import path
-    from pytsite import reg, lang, tpl, plugman, update as pytsite_update
-    from . import _api, _eh
+    from pytsite import reg, lang, tpl, update as pytsite_update
+    from . import _api
 
     reg.put('paths.assets', path.join(reg.get('paths.static'), 'assets'))
 
@@ -30,7 +30,6 @@ def plugin_load():
     pytsite_update.on_update_stage_1(npm_update)
     pytsite_update.on_update_after(build_all)
     pytsite_update.on_update_after(build_translations)
-    plugman.on_install(_eh.plugman_install)
 
     # Register assetman itself and add required assets for all pages
     register_package(__name__)
@@ -67,6 +66,8 @@ def plugin_load_uwsgi():
 
 
 def plugin_install():
+    plugin_load()
+
     from . import _api
 
     if not _api.check_setup():
@@ -74,3 +75,6 @@ def plugin_install():
 
         lang.register_package(__name__)
         _api.setup()
+
+    _api.build_all()
+    _api.build_translations()

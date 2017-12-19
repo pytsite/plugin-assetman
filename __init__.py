@@ -66,8 +66,6 @@ def plugin_load_uwsgi():
 
 
 def plugin_install():
-    plugin_load()
-
     from . import _api
 
     if not _api.check_setup():
@@ -75,6 +73,3 @@ def plugin_install():
 
         lang.register_package(__name__)
         _api.setup()
-
-    _api.build_all()
-    _api.build_translations()

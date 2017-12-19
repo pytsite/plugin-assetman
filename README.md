@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.2.5 (2017-12-19)
+
+Init and installation fixed.
+
+
 ### 1.2.4 (2017-12-19)
 
 Init and installation fixed.

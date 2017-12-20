@@ -595,8 +595,6 @@ def build_translations():
     """Compile translations
     """
     from pytsite import console, tpl
-    from plugins import assetman
-
     console.print_info(_lang.t('assetman@compiling_translations'))
 
     translations = {}
@@ -607,7 +605,7 @@ def build_translations():
             translations[lang_code][pkg_name] = _lang.get_package_translations(pkg_name, lang_code)
 
     # Write translations to static file
-    output_file = _path.join(assetman.get_dst_dir_path('plugins.assetman'), 'lang-translations.js')
+    output_file = _path.join(get_dst_dir_path('plugins.assetman'), 'lang-translations.js')
     output_dir = _path.dirname(output_file)
 
     if not _path.exists(output_dir):

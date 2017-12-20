@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.2.9 (2017-12-20)
+
+Improper import fixed.
+
+
 ### 1.2.8 (2017-12-20)
 
 Init fixed.

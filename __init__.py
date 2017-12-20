@@ -15,23 +15,15 @@ if _plugman.is_installed(__name__):
         get_src_dir_path, get_dst_dir_path, npm_update, on_split_location
 
 
-def plugin_load():
+def _register_resources():
     from os import path
-    from pytsite import reg, lang, tpl, update as pytsite_update
+    from pytsite import reg, lang, tpl
     from . import _api
 
     reg.put('paths.assets', path.join(reg.get('paths.static'), 'assets'))
 
-    # Resources
     lang.register_package(__name__)
     tpl.register_package(__name__)
-
-    # Event handlers
-    pytsite_update.on_update_stage_1(npm_update)
-    pytsite_update.on_update_after(build_all)
-    pytsite_update.on_update_after(build_translations)
-
-    # Register assetman itself and add required assets for all pages
     register_package(__name__)
 
     js_module('assetman-build-timestamps', __name__ + '@build-timestamps')
@@ -40,6 +32,17 @@ def plugin_load():
     js_module('lang', __name__ + '@lang')
 
     t_js(__name__)
+
+
+def plugin_load():
+    from pytsite import update as pytsite_update
+
+    _register_resources()
+
+    # Event handlers
+    pytsite_update.on_update_stage_1(npm_update)
+    pytsite_update.on_update_after(build_all)
+    pytsite_update.on_update_after(build_translations)
 
 
 def plugin_load_console():
@@ -73,3 +76,7 @@ def plugin_install():
 
         lang.register_package(__name__)
         _api.setup()
+
+    _register_resources()
+    _api.build_all()
+    _api.build_translations()

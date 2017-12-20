@@ -70,12 +70,12 @@ def plugin_load_uwsgi():
 def plugin_install():
     from . import _api
 
+    _register_resources()
+
     if not _api.check_setup():
         from pytsite import lang
 
-        lang.register_package(__name__)
         _api.setup()
 
-    _register_resources()
     _api.build_all()
     _api.build_translations()

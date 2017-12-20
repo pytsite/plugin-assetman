@@ -24,7 +24,7 @@ def _register_resources():
 
     lang.register_package(__name__)
     tpl.register_package(__name__)
-    register_package(__name__)
+    _api.register_package(__name__)
 
     js_module('assetman-build-timestamps', __name__ + '@build-timestamps')
     js_module('pytsite-lang-translations', __name__ + '@lang-translations')

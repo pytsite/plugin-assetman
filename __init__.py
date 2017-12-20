@@ -24,14 +24,13 @@ def _register_resources():
 
     lang.register_package(__name__)
     tpl.register_package(__name__)
+
     _api.register_package(__name__)
-
-    js_module('assetman-build-timestamps', __name__ + '@build-timestamps')
-    js_module('pytsite-lang-translations', __name__ + '@lang-translations')
-    js_module('assetman', __name__ + '@assetman')
-    js_module('lang', __name__ + '@lang')
-
-    t_js(__name__)
+    _api.js_module('assetman-build-timestamps', __name__ + '@build-timestamps')
+    _api.js_module('pytsite-lang-translations', __name__ + '@lang-translations')
+    _api.js_module('assetman', __name__ + '@assetman')
+    _api.js_module('lang', __name__ + '@lang')
+    _api.t_js(__name__)
 
 
 def plugin_load():

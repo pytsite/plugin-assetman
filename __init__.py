@@ -15,10 +15,16 @@ if _plugman.is_installed(__name__):
         get_src_dir_path, get_dst_dir_path, npm_update, on_split_location
 
 
-def _register_assetman_resources():
+def _register_resources():
     from os import path
-    from pytsite import reg
+    from pytsite import lang, tpl, reg
     from . import _api
+
+    if not lang.is_package_registered(__name__):
+        lang.register_package(__name__)
+
+    if not tpl.is_package_registered(__name__):
+        tpl.register_package(__name__)
 
     if not _api.is_package_registered(__name__):
         reg.put('paths.assets', path.join(reg.get('paths.static'), 'assets'))
@@ -34,11 +40,9 @@ def _register_assetman_resources():
 def plugin_install():
     from . import _api
 
-    _register_assetman_resources()
+    _register_resources()
 
     if not _api.check_setup():
-        from pytsite import lang
-
         _api.setup()
 
     _api.build_all()
@@ -46,12 +50,9 @@ def plugin_install():
 
 
 def plugin_load():
-    from pytsite import lang, tpl
     from pytsite import update as pytsite_update
 
-    lang.register_package(__name__)
-    tpl.register_package(__name__)
-    _register_assetman_resources()
+    _register_resources()
 
     # Event handlers
     pytsite_update.on_update_stage_1(npm_update)

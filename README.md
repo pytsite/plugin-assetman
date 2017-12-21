@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.2.11 (2017-12-21)
+
+Init code fixed.
+
+
 ### 1.2.10 (2017-12-21)
 
 Init code fixed.

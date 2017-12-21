@@ -15,28 +15,43 @@ if _plugman.is_installed(__name__):
         get_src_dir_path, get_dst_dir_path, npm_update, on_split_location
 
 
-def _register_resources():
+def _register_assetman_resources():
     from os import path
-    from pytsite import reg, lang, tpl
+    from pytsite import reg
     from . import _api
 
-    reg.put('paths.assets', path.join(reg.get('paths.static'), 'assets'))
+    if not _api.is_package_registered(__name__):
+        reg.put('paths.assets', path.join(reg.get('paths.static'), 'assets'))
 
-    lang.register_package(__name__)
-    tpl.register_package(__name__)
+        _api.register_package(__name__)
+        _api.js_module('assetman-build-timestamps', __name__ + '@build-timestamps')
+        _api.js_module('pytsite-lang-translations', __name__ + '@lang-translations')
+        _api.js_module('assetman', __name__ + '@assetman')
+        _api.js_module('lang', __name__ + '@lang')
+        _api.t_js(__name__)
 
-    _api.register_package(__name__)
-    _api.js_module('assetman-build-timestamps', __name__ + '@build-timestamps')
-    _api.js_module('pytsite-lang-translations', __name__ + '@lang-translations')
-    _api.js_module('assetman', __name__ + '@assetman')
-    _api.js_module('lang', __name__ + '@lang')
-    _api.t_js(__name__)
+
+def plugin_install():
+    from . import _api
+
+    _register_assetman_resources()
+
+    if not _api.check_setup():
+        from pytsite import lang
+
+        _api.setup()
+
+    _api.build_all()
+    _api.build_translations()
 
 
 def plugin_load():
+    from pytsite import lang, tpl
     from pytsite import update as pytsite_update
 
-    _register_resources()
+    lang.register_package(__name__)
+    tpl.register_package(__name__)
+    _register_assetman_resources()
 
     # Event handlers
     pytsite_update.on_update_stage_1(npm_update)
@@ -65,17 +80,3 @@ def plugin_load_uwsgi():
 
     preload(__name__ + '@require.js', True, head=True)
     preload(__name__ + '@require-config.js', True, head=True)
-
-
-def plugin_install():
-    from . import _api
-
-    _register_resources()
-
-    if not _api.check_setup():
-        from pytsite import lang
-
-        _api.setup()
-
-    _api.build_all()
-    _api.build_translations()

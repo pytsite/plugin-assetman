@@ -56,8 +56,6 @@ def plugin_load():
 
     # Event handlers
     pytsite_update.on_update_stage_1(npm_update)
-    pytsite_update.on_update_after(build_all)
-    pytsite_update.on_update_after(build_translations)
 
 
 def plugin_load_console():

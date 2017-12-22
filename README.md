@@ -4,6 +4,12 @@
 ## Changelog
 
 
+### 1.2.13 (2017-12-22)
+
+Removed automatic assets and translations compilation on PytSite update
+event.
+
+
 ### 1.2.12 (2017-12-21)
 
 Init code fixed.

@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.2.14 (2018-01-03)
+
+Fixed unnecessary translations compilation of aliased packages.
+
+
 ### 1.2.13 (2017-12-22)
 
 Removed automatic assets and translations compilation on PytSite update

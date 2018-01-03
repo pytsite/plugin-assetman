@@ -601,8 +601,9 @@ def build_translations():
     for lang_code in _lang.langs():
         translations[lang_code] = {}
         for pkg_name, info in _lang.get_packages().items():
-            _logger.info('Compiling translations for {} ({})'.format(pkg_name, lang_code))
-            translations[lang_code][pkg_name] = _lang.get_package_translations(pkg_name, lang_code)
+            if not info['__is_alias']:
+                _logger.info('Compiling translations for {} ({})'.format(pkg_name, lang_code))
+                translations[lang_code][pkg_name] = _lang.get_package_translations(pkg_name, lang_code)
 
     # Write translations to static file
     output_file = _path.join(get_dst_dir_path('plugins.assetman'), 'lang-translations.js')

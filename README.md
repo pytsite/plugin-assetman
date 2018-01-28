@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.2.15 (2018-01-28)
+
+Init code fixed.
+
+
 ### 1.2.14 (2018-01-03)
 
 Fixed unnecessary translations compilation of aliased packages.

@@ -1,6 +1,6 @@
 {
   "name": "assetman",
-  "version": "1.2.14",
+  "version": "1.2.15",
   "description": {
     "en": "Assetman",
     "ru": "Assetman",
@@ -11,9 +11,5 @@
     "name": "Alexander Shepetko",
     "email": "a@shepetko.com",
     "url": "https://shepetko.com"
-  },
-  "requires": {
-    "packages": [],
-    "plugins": []
   }
 }

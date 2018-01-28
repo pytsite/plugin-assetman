@@ -1,11 +1,11 @@
 """PytSite Assetman Plugin Console Commands
 """
-from pytsite import console as _console, maintenance as _maintenance
-from . import _api, _error
-
 __author__ = 'Alexander Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
+
+from pytsite import console as _console, maintenance as _maintenance
+from . import _api, _error
 
 
 class Build(_console.Command):

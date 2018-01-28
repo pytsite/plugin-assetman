@@ -1,5 +1,9 @@
 """PytSite Assetman Plugin API Functions
 """
+__author__ = 'Alexander Shepetko'
+__email__ = 'a@shepetko.com'
+__license__ = 'MIT'
+
 import subprocess as _subprocess
 import json as _json
 from typing import Dict as _Dict, List as _List, Tuple as _Tuple, Union as _Union, Callable as _Callable
@@ -10,10 +14,6 @@ from time import time as _time
 from pytsite import router as _router, threading as _threading, util as _util, reg as _reg, console as _console, \
     lang as _lang, tpl as _tpl, events as _events, logger as _logger
 from . import _error
-
-__author__ = 'Alexander Shepetko'
-__email__ = 'a@shepetko.com'
-__license__ = 'MIT'
 
 _package_paths = {}  # type: _Dict[str, _Tuple[str, str]]
 _package_aliases = {}  # type: _Dict[str, str]
@@ -436,7 +436,7 @@ def setup():
     if _run_process(['which', 'npm']).returncode != 0:
         raise RuntimeError('NPM executable is not found. Check https://docs.npmjs.com/getting-started/installing-node')
 
-    # Install required public NPM packages
+    # Install required NPM packages
     _console.print_info(_lang.t('assetman@installing_required_npm_packages'))
     if _run_process(['npm', 'install'] + _REQUIRED_NPM_PACKAGES, _reg.get('debug', False)).returncode != 0:
         raise RuntimeError('Error while installing NPM packages: {}'.format(_REQUIRED_NPM_PACKAGES))

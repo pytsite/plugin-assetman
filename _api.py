@@ -625,8 +625,6 @@ def build(package_name: str):
     """
     global _globals
 
-    _console.print_info(_lang.t('assetman@compiling_assets_for_package', {'package': package_name}))
-
     package_name = resolve_package_name(package_name)
     assets_dst_path = get_dst_dir_path(package_name)
 
@@ -650,7 +648,9 @@ def build(package_name: str):
 
     if not tasks_file_content:
         _update_timestamp_config(package_name)
-        raise _error.NoTasksDefined(package_name)
+        return
+
+    _console.print_info(_lang.t('assetman@compiling_assets_for_package', {'package': package_name}))
 
     with open(_GULP_TASKS_FILE, 'wt') as f:
         f.write(_json.dumps(tasks_file_content))

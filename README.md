@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.3 (2018-01-29)
+
+`error.NoTasksDefined` removed.
+
+
 ### 1.2.15 (2018-01-28)
 
 Init code fixed.

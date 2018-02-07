@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.3.1 (2018-02-07)
+
+Support for PytSite-7.7.
+
+
 ### 1.3 (2018-01-29)
 
 `error.NoTasksDefined` removed.

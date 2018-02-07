@@ -49,7 +49,7 @@ class Build(_console.Command):
             _api.build_translations()
 
         except (RuntimeError, _error.PackageNotRegistered, _error.PackageAlreadyRegistered) as e:
-            raise _console.error.Error(e)
+            raise _console.error.CommandExecutionError(e)
 
         finally:
             if maint:

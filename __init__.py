@@ -30,7 +30,7 @@ def plugin_load():
     _api.t_js(__name__)
 
     # Events handlers
-    pytsite_update.on_update_stage_1(lambda data: npm_update())
+    pytsite_update.on_update_stage_1(npm_update)
 
 
 def plugin_install():

@@ -14,8 +14,7 @@ from ._api import register_package, library, preload, remove, dump_js, dump_css,
 
 def plugin_load():
     from os import path
-    from pytsite import lang, tpl, reg
-    from pytsite import update as pytsite_update
+    from pytsite import lang, tpl, reg, update
 
     lang.register_package(__name__)
     tpl.register_package(__name__)
@@ -30,7 +29,7 @@ def plugin_load():
     _api.t_js(__name__)
 
     # Events handlers
-    pytsite_update.on_update_stage_1(npm_update)
+    update.on_update_stage_1(npm_update)
 
 
 def plugin_install():
@@ -45,9 +44,9 @@ def plugin_install():
 
 def plugin_load_console():
     from pytsite import console
-    from . import _console_commands
+    from . import _cc
 
-    console.register_command(_console_commands.Build())
+    console.register_command(_cc.Build())
 
 
 def plugin_load_uwsgi():

@@ -602,7 +602,7 @@ def build_translations():
         translations[lang_code] = {}
         for pkg_name, info in _lang.get_packages().items():
             if not info['__is_alias']:
-                _logger.info('Compiling translations for {} ({})'.format(pkg_name, lang_code))
+                _logger.debug('Compiling translations for {} ({})'.format(pkg_name, lang_code))
                 translations[lang_code][pkg_name] = _lang.get_package_translations(pkg_name, lang_code)
 
     # Write translations to static file
@@ -613,7 +613,7 @@ def build_translations():
         _makedirs(output_dir, 0o755, True)
 
     with open(output_file, 'wt', encoding='utf-8') as f:
-        _logger.info("Writing translations into '{}'".format(output_file))
+        _logger.debug("Writing translations into '{}'".format(output_file))
         f.write(tpl.render('assetman@translations-js', {
             'langs_json': _json.dumps(_lang.langs()),
             'translations_json': _json.dumps(translations),

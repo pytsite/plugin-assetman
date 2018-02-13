@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.3.5 (2018-02-14)
+
+Logging verbosity decreased.
+
+
 ### 1.3.4 (2018-02-11)
 
 File renamed.

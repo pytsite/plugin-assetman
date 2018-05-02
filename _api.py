@@ -541,7 +541,7 @@ def _update_js_config_file(file_path: str, tpl_name: str, data: dict):
 
         try:
             json_data = _json.loads(json_str)  # type: dict
-        except _json.JSONDecodeError as e:
+        except _json.JSONDecodeError:
             # Remove corrupted file and re-run this function to reconstruct the file
             _console.print_warning('{} is corrupted and will be rebuilt'.format(file_path))
             _unlink(file_path)
@@ -621,7 +621,7 @@ def build_translations():
 
 
 def build(package_name: str):
-    """Compile assets.
+    """Compile assets
     """
     global _globals
 
@@ -656,8 +656,7 @@ def build(package_name: str):
         f.write(_json.dumps(tasks_file_content))
 
     # Run Gulp
-    debug = _reg.get('debug')
-    _run_node_bin('gulp', '--silent', gulpfile=_GULPFILE, debug=debug, tasksFile=_GULP_TASKS_FILE)
+    _run_node_bin('gulp', '--silent', gulpfile=_GULPFILE, tasksFile=_GULP_TASKS_FILE)
 
     # Update timestamp
     _update_timestamp_config(package_name)

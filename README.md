@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.3.6 (2018-05-02)
+
+Fix to support version 10 of NPM.
+
+
 ### 1.3.5 (2018-02-14)
 
 Logging verbosity decreased.

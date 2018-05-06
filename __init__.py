@@ -38,9 +38,6 @@ def plugin_install():
     if not _api.check_setup():
         _api.setup()
 
-    _api.build_all()
-    _api.build_translations()
-
 
 def plugin_load_console():
     from pytsite import console

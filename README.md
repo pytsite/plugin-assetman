@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.3.7 (2018-05-06)
+
+Unnecessary call of `build_all()` during plugin installation removed.
+
+
 ### 1.3.6 (2018-05-02)
 
 Fix to support version 10 of NPM.

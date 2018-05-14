@@ -45,9 +45,6 @@ class Build(_console.Command):
             else:
                 _api.build_all()
 
-            # Compile translations
-            _api.build_translations()
-
         except (RuntimeError, _error.PackageNotRegistered, _error.PackageAlreadyRegistered) as e:
             raise _console.error.CommandExecutionError(e)
 

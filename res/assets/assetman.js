@@ -1,9 +1,18 @@
-define(['jquery', 'assetman-build-timestamps'], function ($, tStamps) {
+define(['jquery', 'assetman-build-timestamps', 'assetman-package-aliases'], function ($, tStamps, pAliases) {
+    if (!String.prototype.endsWith) {
+        String.prototype.endsWith = function (search, this_len) {
+            if (this_len === undefined || this_len > this.length) {
+                this_len = this.length;
+            }
+            return this.substring(this_len - search.length, this_len) === search;
+        };
+    }
+
     function assetUrl(url) {
         if (url.indexOf('/') === 0 || url.indexOf('http') === 0)
             return url;
 
-        var pkgName = $('meta[name="pytsite-theme"]').attr('content');
+        var pkgName = 'default';
         var assetPath = url;
         var urlParts = url.split('@');
 
@@ -12,10 +21,13 @@ define(['jquery', 'assetman-build-timestamps'], function ($, tStamps) {
             assetPath = urlParts[1];
         }
 
+        if (pAliases.hasOwnProperty(pkgName))
+            pkgName = pAliases[pkgName];
+
         return location.origin + '/assets/' + pkgName + '/' + assetPath + '?v=' + tStamps[pkgName];
     }
 
-    function loadResource(resType, resLoc, callbackFunc, async) {
+    function _loadResource(resType, resLoc, callbackFunc, async) {
         resLoc = assetUrl(resLoc).replace(/\?v=[0-9a-f]+/, '');
 
         // Async is default for CSS but not for JS
@@ -28,7 +40,7 @@ define(['jquery', 'assetman-build-timestamps'], function ($, tStamps) {
 
             setTimeout(function () {
                 // It is important to pass 'false' as last argument!
-                loadResource(resType, resLoc, callbackFunc, false);
+                _loadResource(resType, resLoc, callbackFunc, false);
                 deferred.resolve();
             }, 0);
 
@@ -54,12 +66,24 @@ define(['jquery', 'assetman-build-timestamps'], function ($, tStamps) {
             callbackFunc(resLoc);
     }
 
-    function loadJS(location, callback, async) {
-        return loadResource('js', location, callback, async)
+    function loadCSS(location, callback, async) {
+        return _loadResource('css', location, callback, async)
     }
 
-    function loadCSS(location, callback, async) {
-        return loadResource('css', location, callback, async)
+    function loadJS(location, callback, async) {
+        return _loadResource('js', location, callback, async)
+    }
+
+    function load(location, callback, async) {
+        if (location.endsWith('.css')) {
+            return loadCSS(location, callback, async);
+        }
+        else if (location.endsWith('.js')) {
+            return loadJS(location, callback, async);
+        }
+        else {
+            throw 'Cannot determine type of asset'
+        }
     }
 
     function parseLocation(skipEmpty) {
@@ -133,11 +157,17 @@ define(['jquery', 'assetman-build-timestamps'], function ($, tStamps) {
         return r.join("&");
     }
 
+    function definePackageAlias(alias, packageName) {
+        pAliases[alias] = packageName;
+    }
+
     return {
         assetUrl: assetUrl,
         loadJS: loadJS,
         loadCSS: loadCSS,
+        load: load,
         parseLocation: parseLocation,
-        encodeQuery: encodeQuery
+        encodeQuery: encodeQuery,
+        definePackageAlias: definePackageAlias
     }
 });

@@ -591,6 +591,14 @@ def _update_timestamp_config(package_name: str):
     })
 
 
+def _update_package_aliases_config(package_name: str):
+    js_config_f_path = _path.join(_reg.get('paths.assets'), 'plugins.assetman', 'package-aliases.js')
+
+    for alias, p_name in _package_aliases.items():
+        if package_name == p_name:
+            _update_js_config_file(js_config_f_path, 'assetman@package-aliases', {alias: p_name})
+
+
 def build_translations():
     """Compile translations
     """
@@ -661,6 +669,9 @@ def build(package_name: str):
     # Update timestamp
     _update_timestamp_config(package_name)
 
+    # Update package aliases config
+    _update_package_aliases_config(package_name)
+
     # Update RequireJS config
     for rjs_module_name, rjs_module_asset_data in _requirejs_modules.items():
         m_asset_location = rjs_module_asset_data[0]
@@ -686,6 +697,8 @@ def build_all():
 
     for package_name in _package_paths:
         build(package_name)
+
+    build_translations()
 
 
 def on_split_location(handler, priority: int = 0):

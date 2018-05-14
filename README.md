@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.4.1 (2018-05-14)
+
+Installation hook fixed.
+
+
 ### 1.4 (2018-05-14)
 
 - Package aliases resolving in JS code added.

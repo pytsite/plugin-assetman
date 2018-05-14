@@ -33,13 +33,6 @@ def plugin_load():
     update.on_update_stage_1(npm_update)
 
 
-def plugin_install():
-    from . import _api
-
-    if not _api.check_setup():
-        _api.setup()
-
-
 def plugin_load_console():
     from pytsite import console
     from . import _cc
@@ -61,3 +54,12 @@ def plugin_load_uwsgi():
 
     preload(__name__ + '@require.js', True, head=True)
     preload(__name__ + '@require-config.js', True, head=True)
+
+
+def plugin_install():
+    from . import _api
+
+    if not _api.check_setup():
+        _api.setup()
+
+    _api.build(__name__)

@@ -111,7 +111,7 @@ def register_package(package_name: str, assets_dir: str = 'res/assets', alias: s
 
 
 def library(name: str, assets: _Union[_List, _Callable[..., _List]]):
-    """Define a library of assets.
+    """Define a library of assets
     """
     if name in _libraries:
         raise _error.LibraryAlreadyRegistered(name)
@@ -185,10 +185,7 @@ def preload(location: str, permanent: bool = False, collection: str = None, weig
 
     # Library
     if location in _libraries:
-        if callable(_libraries[location]):
-            assets = _libraries[location](**kwargs)  # type: _List
-        else:
-            assets = _libraries[location]  # type: _List
+        assets = _libraries[location]  # type: _List
 
         if not isinstance(_libraries[location], _List):
             raise TypeError('List expected')
@@ -548,6 +545,9 @@ def _update_js_config_file(file_path: str, tpl_name: str, data: dict):
             return _update_js_config_file(file_path, tpl_name, data)
 
     json_data = _util.dict_merge(json_data, data)
+    for k, v in json_data.items():
+        if isinstance(v, list):
+            json_data[k] = _util.cleanup_list(v, True)
 
     with open(file_path, 'wt') as f:
         f.write(_tpl.render(tpl_name, {'data': json_data}, False))
@@ -597,6 +597,11 @@ def _update_package_aliases_config(package_name: str):
     for alias, p_name in _package_aliases.items():
         if package_name == p_name:
             _update_js_config_file(js_config_f_path, 'assetman@package-aliases', {alias: p_name})
+
+
+def _update_libraries_config():
+    js_config_f_path = _path.join(_reg.get('paths.assets'), 'plugins.assetman', 'libraries.js')
+    _update_js_config_file(js_config_f_path, 'assetman@libraries', _libraries)
 
 
 def build_translations():
@@ -671,6 +676,9 @@ def build(package_name: str):
 
     # Update package aliases config
     _update_package_aliases_config(package_name)
+
+    # Update libraries config
+    _update_libraries_config()
 
     # Update RequireJS config
     for rjs_module_name, rjs_module_asset_data in _requirejs_modules.items():

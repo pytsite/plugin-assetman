@@ -24,6 +24,7 @@ def plugin_load():
     _api.register_package(__name__)
     _api.js_module('assetman-build-timestamps', __name__ + '@build-timestamps')
     _api.js_module('assetman-package-aliases', __name__ + '@package-aliases')
+    _api.js_module('assetman-libraries', __name__ + '@libraries')
     _api.js_module('pytsite-lang-translations', __name__ + '@lang-translations')
     _api.js_module('assetman', __name__ + '@assetman')
     _api.js_module('lang', __name__ + '@lang')

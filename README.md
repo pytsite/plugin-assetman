@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.5 (2018-05-21)
+
+Asset libraries resolving in JS code added.
+
+
 ### 1.4.1 (2018-05-14)
 
 Installation hook fixed.

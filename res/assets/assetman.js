@@ -1,4 +1,4 @@
-define(['jquery', 'assetman-build-timestamps', 'assetman-package-aliases'], function ($, tStamps, pAliases) {
+define(['jquery', 'assetman-build-timestamps', 'assetman-package-aliases', 'assetman-libraries'], function ($, tStamps, pAliases, libraries) {
     if (!String.prototype.endsWith) {
         String.prototype.endsWith = function (search, this_len) {
             if (this_len === undefined || this_len > this.length) {
@@ -75,14 +75,19 @@ define(['jquery', 'assetman-build-timestamps', 'assetman-package-aliases'], func
     }
 
     function load(location, callback, async) {
-        if (location.endsWith('.css')) {
+        if (location in libraries) {
+            $.each(libraries[location], function(index, location) {
+                load(location);
+            })
+        }
+        else if (location.endsWith('.css')) {
             return loadCSS(location, callback, async);
         }
         else if (location.endsWith('.js')) {
             return loadJS(location, callback, async);
         }
         else {
-            throw 'Cannot determine type of asset'
+            throw 'Cannot determine type of asset for location ' + location;
         }
     }
 

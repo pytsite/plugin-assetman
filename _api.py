@@ -669,7 +669,8 @@ def build(package_name: str):
         f.write(_json.dumps(tasks_file_content))
 
     # Run Gulp
-    _run_node_bin('gulp', '--silent', gulpfile=_GULPFILE, tasksFile=_GULP_TASKS_FILE)
+    _run_node_bin('gulp', '--silent', gulpfile=_GULPFILE, tasksFile=_GULP_TASKS_FILE,
+                  minify=not _reg.get('debug', False))
 
     # Update timestamp
     _update_timestamp_config(package_name)

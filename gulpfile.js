@@ -1,11 +1,11 @@
-var fs = require('fs');
-var yargs = require('yargs');
-var gulp = require('gulp');
-var ignore = require('gulp-ignore');
-var debug = yargs.argv.debug === 'yes';
+const fs = require('fs');
+const yargs = require('yargs');
+const gulp = require('gulp');
+const ignore = require('gulp-ignore');
+const minify = yargs.argv['minify'] === 'yes';
 
 function minifyJS(s) {
-    var jsmin = require('gulp-minify');
+    const jsmin = require('gulp-minify');
 
     return s.pipe(jsmin({
         ext: {
@@ -16,7 +16,7 @@ function minifyJS(s) {
 }
 
 function minifyCSS(s) {
-    var cssmin = require('gulp-cssmin');
+    const cssmin = require('gulp-cssmin');
 
     return s.pipe(cssmin());
 }
@@ -26,7 +26,7 @@ function copy(stream) {
 }
 
 function copyStatic(stream) {
-    var filter = ignore.include(/\.(png|jpg|jpeg|gif|svg|ttf|woff|woff2|eot|otf|map|min\.js|min\.css)$/);
+    const filter = ignore.include(/\.(png|jpg|jpeg|gif|svg|ttf|woff|woff2|eot|otf|map|min\.js|min\.css)$/);
 
     return stream.pipe(filter)
 }
@@ -36,7 +36,7 @@ function js(stream, args) {
     stream = stream.pipe(ignore.exclude(/\.(min|pack)\.js$/));
 
     if (args.babelify) {
-        var babel = require('gulp-babel');
+        const babel = require('gulp-babel');
 
         stream = stream.pipe(babel({
             presets: ['es2015']
@@ -44,7 +44,7 @@ function js(stream, args) {
     }
 
     // Minify
-    if (!debug)
+    if (minify)
         stream = minifyJS(stream);
 
     return stream;
@@ -56,19 +56,19 @@ function css(stream) {
     stream = stream.pipe(ignore.exclude(/\.(min|pack)\.css$/));
 
     // Minify
-    if (!debug)
+    if (minify)
         stream = minifyCSS(stream);
 
     return stream;
 }
 
 function less(stream) {
-    var gulpLess = require('gulp-less');
+    const gulpLess = require('gulp-less');
 
     stream = stream.pipe(ignore.include(/\.less/)).pipe(gulpLess());
 
     // Minify
-    if (!debug)
+    if (minify)
         stream = minifyCSS(stream);
 
     return stream;
@@ -76,7 +76,7 @@ function less(stream) {
 
 
 gulp.task('default', function () {
-    var tasksFile = yargs.argv.tasksFile;
+    const tasksFile = yargs.argv.tasksFile;
 
     if (!tasksFile)
         throw 'Tasks file path is not specified';
@@ -86,10 +86,10 @@ gulp.task('default', function () {
             return console.log(err);
         }
 
-        var tasks = JSON.parse(data);
-        for (var i = 0; i < tasks.length; i++) {
-            var task = tasks[i];
-            var stream = gulp.src(task.source);
+        const tasks = JSON.parse(data);
+        for (let i = 0; i < tasks.length; i++) {
+            const task = tasks[i];
+            let stream = gulp.src(task.source);
 
             switch (task.name) {
                 case 'copy':

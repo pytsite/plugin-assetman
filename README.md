@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.5.2 (2018-05-27)
+
+Nonworking minification Gulp's function fixed.
+
+
 ### 1.5.1 (2018-05-22)
 
 Clean installation error fixed.

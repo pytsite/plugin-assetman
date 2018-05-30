@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.6 (2018-05-30)
+
+Support of PytSite-7.23.
+
+
 ### 1.5.2 (2018-05-27)
 
 Nonworking minification Gulp's function fixed.

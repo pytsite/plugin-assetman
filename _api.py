@@ -387,7 +387,7 @@ def url(location: str) -> str:
 
     package_name, asset_path = _split_location(location)
 
-    return _router.url('/assets/{}/{}'.format(package_name, asset_path), strip_lang=True, query={
+    return _router.url('/assets/{}/{}'.format(package_name, asset_path), add_lang_prefix=False, query={
         'v': _get_build_timestamp(package_name)
     })
 

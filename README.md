@@ -4,6 +4,13 @@
 ## Changelog
 
 
+### 1.7 (2018-06-13)
+
+- `remove()` API function removed.
+- `path_prefix`, `exclude_path_prefix` argument removed from
+  `preload()`.
+
+
 ### 1.6 (2018-05-30)
 
 Support of PytSite-7.23.

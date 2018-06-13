@@ -25,7 +25,7 @@ _requirejs_modules = {}  # type: _Dict[str, tuple]
 _locations = {}
 _last_weight = {}
 
-_p_locations = {}
+_p_locations = {}  # Permanent locations
 _last_p_weight = 0
 
 _inline = {}
@@ -177,8 +177,6 @@ def preload(location: str, permanent: bool = False, collection: str = None, weig
     if not permanent and not _router.request():
         raise RuntimeError('Non permanent assets only allowed while processing HTTP requests')
 
-    path_prefix = kwargs.get('path_prefix')
-    exclude_path_prefix = kwargs.get('exclude_path_prefix')
     head = kwargs.get('head')
     async = kwargs.get('async')
     defer = kwargs.get('defer')
@@ -191,8 +189,7 @@ def preload(location: str, permanent: bool = False, collection: str = None, weig
             raise TypeError('List expected')
 
         for asset_location in assets:
-            preload(asset_location, permanent, collection, weight, path_prefix=path_prefix,
-                    exclude_path_prefix=exclude_path_prefix, async=async, defer=defer, head=head)
+            preload(asset_location, permanent, collection, weight, async=async, defer=defer, head=head)
 
         return
 
@@ -200,23 +197,11 @@ def preload(location: str, permanent: bool = False, collection: str = None, weig
     if not collection:
         collection = detect_collection(location)
 
-    if path_prefix:
-        if not isinstance(path_prefix, (list, tuple)):
-            path_prefix = [path_prefix]
-    else:
-        path_prefix = []
-
-    if exclude_path_prefix:
-        if not isinstance(exclude_path_prefix, (list, tuple)):
-            exclude_path_prefix = [exclude_path_prefix]
-    else:
-        exclude_path_prefix = []
-
     tid = _threading.get_id()
     if tid not in _locations:
         _locations[tid] = {}
 
-    location_hash = _util.md5_hex_digest(str((location, path_prefix, exclude_path_prefix)))
+    location_hash = _util.md5_hex_digest(str(location))
 
     if location_hash not in _p_locations and location_hash not in _locations[tid]:
         if permanent:
@@ -228,8 +213,7 @@ def preload(location: str, permanent: bool = False, collection: str = None, weig
             elif weight > _last_p_weight:
                 _last_p_weight = weight
 
-            _p_locations[location_hash] = (location, collection, weight, path_prefix, exclude_path_prefix, async,
-                                           defer, head)
+            _p_locations[location_hash] = (location, collection, weight, async, defer, head)
         else:
             if not weight:
                 _last_weight[tid] += 10
@@ -237,8 +221,7 @@ def preload(location: str, permanent: bool = False, collection: str = None, weig
             elif weight > _last_weight[tid]:
                 _last_weight[tid] = weight
 
-            _locations[tid][location_hash] = (location, collection, weight, path_prefix, exclude_path_prefix, async,
-                                              defer, head)
+            _locations[tid][location_hash] = (location, collection, weight, async, defer, head)
 
 
 def add_inline(s: str, weight=0):
@@ -254,23 +237,6 @@ def add_inline(s: str, weight=0):
     _inline[tid].append((s, weight))
 
 
-def remove(location):
-    """Remove an asset location.
-    """
-    tid = _threading.get_id()
-    if tid not in _locations:
-        return
-
-    # Location as a string
-    if isinstance(location, str):
-        _locations[tid] = {k: v for k, v in _locations[tid].items() if location != v[0]}
-    # Location as a compiled regular expression
-    elif not isinstance(location, str) and location.__class__.__name__ == 'SRE_Pattern':
-        _locations[tid] = {k: v for k, v in _locations[tid].items() if not location.match(v[0])}
-    else:
-        raise TypeError('String or compiled regular expression expected.')
-
-
 def reset():
     """Remove all previously added locations and inline code except 'permanent'.
     """
@@ -284,7 +250,7 @@ def reset():
     _last_i_weight[tid] = 0
 
 
-def get_locations(collection: str = None, filter_path: bool = True) -> list:
+def get_locations(collection: str = None) -> list:
     tid = _threading.get_id()
 
     p_locations = _p_locations.values()
@@ -295,29 +261,6 @@ def get_locations(collection: str = None, filter_path: bool = True) -> list:
     # Filter by collection
     if collection:
         locations = [l for l in locations if l[1] == collection]
-
-    # Filter by path prefix inclusion/exclusion
-    if filter_path:
-        current_path = _router.current_path()
-
-        filtered_locations = []
-
-        for l in locations:
-            # Filter in inclusions
-            if l[3]:
-                for path_prefix in l[3]:
-                    if current_path.startswith(path_prefix):
-                        filtered_locations.append(l)
-            else:
-                filtered_locations.append(l)
-
-            # Filter out exclusions
-            if l[4]:
-                for exclude_path_prefix in l[4]:
-                    if current_path.startswith(exclude_path_prefix):
-                        filtered_locations.remove(l)
-
-        locations = filtered_locations
 
     # Build unique list.
     # Duplicates are possible because same location may be added more than once with different path prefixes.
@@ -345,9 +288,9 @@ def dump_js(html_escape: bool = True, head: bool = False) -> str:
     r = ''
     for loc in get_locations('js'):
         l_url = url(_util.escape_html(loc[0])) if html_escape else url(loc[0])
-        l_async = ' async' if loc[4] else ''
-        l_defer = ' defer' if loc[5] else ''
-        l_head = loc[6]
+        l_async = ' async' if loc[3] else ''
+        l_defer = ' defer' if loc[4] else ''
+        l_head = loc[5]
 
         if (not head and not l_head) or (head and l_head):
             r += '<script type="text/javascript" src="{}"{}{}></script>\n'.format(l_url, l_async, l_defer)
@@ -392,10 +335,10 @@ def url(location: str) -> str:
     })
 
 
-def get_urls(collection: str = None, filter_path: bool = True) -> list:
+def get_urls(collection: str = None) -> list:
     """Get URLs of all locations in the collection.
     """
-    return [url(l[0]) for l in get_locations(collection, filter_path)]
+    return [url(l[0]) for l in get_locations(collection)]
 
 
 def register_global(name: str, value, overwrite: bool = False):

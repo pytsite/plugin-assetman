@@ -6,10 +6,10 @@ __license__ = 'MIT'
 
 # Public API
 from . import _error as error
-from ._api import register_package, library, preload, remove, dump_js, dump_css, url, add_inline, dump_inline, \
-    get_urls, get_locations, reset, detect_collection, build, build_translations, build_all, \
-    is_package_registered, register_global, t_browserify, t_copy, t_copy_static, t_less, t_js, t_css, js_module, \
-    get_src_dir_path, get_dst_dir_path, npm_update, on_split_location
+from ._api import register_package, library, preload, dump_js, dump_css, url, add_inline, dump_inline, get_urls, \
+    get_locations, reset, detect_collection, build, build_translations, build_all, is_package_registered, \
+    register_global, t_browserify, t_copy, t_copy_static, t_less, t_js, t_css, js_module, get_src_dir_path, \
+    get_dst_dir_path, npm_update, on_split_location
 
 
 def plugin_load():

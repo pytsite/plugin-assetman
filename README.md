@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.8 (2018-06-22)
+
+Support of strings as second argument in `library()`.
+
+
 ### 1.7 (2018-06-13)
 
 - `remove()` API function removed.

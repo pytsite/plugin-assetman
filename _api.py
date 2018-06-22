@@ -110,7 +110,7 @@ def register_package(package_name: str, assets_dir: str = 'res/assets', alias: s
         _package_aliases[alias] = package_name
 
 
-def library(name: str, assets: _Union[_List, _Callable[..., _List]]):
+def library(name: str, assets: _Union[str, _List[str]]):
     """Define a library of assets
     """
     if name in _libraries:
@@ -118,6 +118,11 @@ def library(name: str, assets: _Union[_List, _Callable[..., _List]]):
 
     if is_package_registered(name):
         raise _error.PackageAlreadyRegistered(name)
+
+    if isinstance(assets, str):
+        assets = [assets]
+    elif not isinstance(assets, list):
+        raise TypeError('List or string expected, got {}'.format(type(assets)))
 
     _libraries[name] = assets
 
@@ -172,7 +177,7 @@ def detect_collection(location: str) -> str:
 
 
 def preload(location: str, permanent: bool = False, collection: str = None, weight: int = 0, **kwargs):
-    """Add an asset.
+    """Preload an asset
     """
     if not permanent and not _router.request():
         raise RuntimeError('Non permanent assets only allowed while processing HTTP requests')
@@ -183,14 +188,8 @@ def preload(location: str, permanent: bool = False, collection: str = None, weig
 
     # Library
     if location in _libraries:
-        assets = _libraries[location]  # type: _List
-
-        if not isinstance(_libraries[location], _List):
-            raise TypeError('List expected')
-
-        for asset_location in assets:
+        for asset_location in _libraries[location]:
             preload(asset_location, permanent, collection, weight, async=async, defer=defer, head=head)
-
         return
 
     # Determine collection
@@ -225,7 +224,7 @@ def preload(location: str, permanent: bool = False, collection: str = None, weig
 
 
 def add_inline(s: str, weight=0):
-    """Add a code which intended to output in the document.
+    """Add a code which intended to output in the HTTP response body
     """
     tid = _threading.get_id()
 

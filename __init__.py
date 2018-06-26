@@ -6,10 +6,10 @@ __license__ = 'MIT'
 
 # Public API
 from . import _error as error
-from ._api import register_package, library, preload, dump_js, dump_css, url, add_inline, dump_inline, get_urls, \
-    get_locations, reset, detect_collection, build, build_translations, build_all, is_package_registered, \
-    register_global, t_browserify, t_copy, t_copy_static, t_less, t_js, t_css, js_module, get_src_dir_path, \
-    get_dst_dir_path, npm_update, on_split_location
+from ._api import register_package, library, preload, js_tags, css_tags, url, add_inline_js, inline_js, urls, \
+    reset, build, build_translations, build_all, is_package_registered, register_global, t_browserify, t_copy, \
+    t_copy_static, t_less, t_js, t_css, js_module, get_src_dir_path, get_dst_dir_path, npm_update, on_split_location, \
+    js_tag, css_tag
 
 
 def plugin_load():
@@ -58,10 +58,12 @@ def plugin_load_uwsgi():
     from pytsite import router, tpl
 
     tpl.register_global('asset_url', url)
-    tpl.register_global('css_links', dump_css)
-    tpl.register_global('js_links', dump_js)
-    tpl.register_global('js_head_links', lambda: dump_js(head=True))
-    tpl.register_global('inline_js', dump_inline)
+    tpl.register_global('css_tag', css_tag)
+    tpl.register_global('css_tags', css_tags)
+    tpl.register_global('js_tag', js_tag)
+    tpl.register_global('js_tags', js_tags)
+    tpl.register_global('js_head_tags', lambda: js_tags(head=True))
+    tpl.register_global('inline_js', inline_js)
 
     router.on_dispatch(reset, -999, '*')
     router.on_xhr_dispatch(reset, -999, '*')

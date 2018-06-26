@@ -28,7 +28,7 @@ _last_weight = {}
 _p_locations = {}  # Permanent locations
 _last_p_weight = 0
 
-_inline = {}
+_inline_js = {}
 _last_i_weight = {}
 
 _globals = {}
@@ -167,10 +167,10 @@ def resolve_package_name(package_name_or_alias) -> str:
     return package_name
 
 
-def detect_collection(location: str) -> str:
-    if location.find('.js') > 0:
+def _detect_collection(location: str) -> str:
+    if '.js' in location:
         return 'js'
-    elif location.find('.css') > 0:
+    elif '.css' in location:
         return 'css'
     else:
         raise ValueError("Cannot determine collection of location '{}'.".format(location))
@@ -194,7 +194,7 @@ def preload(location: str, permanent: bool = False, collection: str = None, weig
 
     # Determine collection
     if not collection:
-        collection = detect_collection(location)
+        collection = _detect_collection(location)
 
     tid = _threading.get_id()
     if tid not in _locations:
@@ -223,7 +223,7 @@ def preload(location: str, permanent: bool = False, collection: str = None, weig
             _locations[tid][location_hash] = (location, collection, weight, async, defer, head)
 
 
-def add_inline(s: str, weight=0):
+def add_inline_js(s: str, weight=0):
     """Add a code which intended to output in the HTTP response body
     """
     tid = _threading.get_id()
@@ -233,7 +233,7 @@ def add_inline(s: str, weight=0):
     elif weight > _last_i_weight[tid]:
         _last_i_weight[tid] = weight
 
-    _inline[tid].append((s, weight))
+    _inline_js[tid].append((s, weight))
 
 
 def reset():
@@ -245,11 +245,11 @@ def reset():
 
     _locations[tid] = {}
     _last_weight[tid] = 0
-    _inline[tid] = []
+    _inline_js[tid] = []
     _last_i_weight[tid] = 0
 
 
-def get_locations(collection: str = None) -> list:
+def _get_locations(collection: str = None) -> list:
     tid = _threading.get_id()
 
     p_locations = _p_locations.values()
@@ -261,61 +261,54 @@ def get_locations(collection: str = None) -> list:
     if collection:
         locations = [l for l in locations if l[1] == collection]
 
-    # Build unique list.
-    # Duplicates are possible because same location may be added more than once with different path prefixes.
-    added = []
-    r = []
-    for l in locations:
-        if l[0] not in added:
-            added.append(l[0])
-            r.append(l)
-
-    return r
+    return locations
 
 
-def get_inline() -> list:
-    tid = _threading.get_id()
-    if tid not in _inline:
-        return []
+def js_tag(location: str, async: bool = False, defer: bool = False) -> str:
+    """Get HTML <script> tags for a location
+    """
+    if location in _libraries:
+        return '\n'.join([js_tag(l, async, defer) for l in _libraries[location] if _detect_collection(l) == 'js'])
 
-    return sorted(_inline[tid], key=lambda x: x[1])
+    location = _util.escape_html(url(location))
+    async = ' async' if async else ''
+    defer = ' defer' if defer else ''
+
+    return '<script type="text/javascript" src="{}"{}{}></script>'.format(location, async, defer)
 
 
-def dump_js(html_escape: bool = True, head: bool = False) -> str:
-    """Dump JS links.
+def js_tags(head: bool = False) -> str:
+    """Get HTML <script> tags for all preloaded links
     """
     r = ''
-    for loc in get_locations('js'):
-        l_url = url(_util.escape_html(loc[0])) if html_escape else url(loc[0])
-        l_async = ' async' if loc[3] else ''
-        l_defer = ' defer' if loc[4] else ''
-        l_head = loc[5]
-
-        if (not head and not l_head) or (head and l_head):
-            r += '<script type="text/javascript" src="{}"{}{}></script>\n'.format(l_url, l_async, l_defer)
+    for l_info in _get_locations('js'):
+        if (not head and not l_info[5]) or (head and l_info[5]):
+            r += js_tag(l_info[0], l_info[3], l_info[4]) + '\n'
 
     return r
 
 
-def dump_css(html_escape: bool = True) -> str:
-    """Dump CSS links.
+def css_tag(location: str) -> str:
+    """Get HTML <link rel="stylesheet"> tag for a location
     """
-    r = ''
-    for loc_url in get_urls('css'):
-        if html_escape:
-            loc_url = _util.escape_html(loc_url)
+    if location in _libraries:
+        return '\n'.join([css_tag(l) for l in _libraries[location] if _detect_collection(l) == 'css'])
 
-        r += '<link rel="stylesheet" href="{}">\n'.format(loc_url)
-
-    return r
+    return '<link rel="stylesheet" href="{}">'.format(_util.escape_html(url(location)))
 
 
-def dump_inline() -> str:
+def css_tags() -> str:
+    """Get HTML <link rel="stylesheet"> tags of preloaded locations
+    """
+    return '\n'.join([css_tag(l_info[0]) for l_info in _get_locations('css')])
+
+
+def inline_js() -> str:
     r = ''
 
     tid = _threading.get_id()
-    if tid in _inline:
-        for item in _inline[tid]:
+    if tid in _inline_js:
+        for item in sorted(_inline_js[tid], key=lambda x: x[1]):
             r += item[0]
 
     return r
@@ -334,10 +327,10 @@ def url(location: str) -> str:
     })
 
 
-def get_urls(collection: str = None) -> list:
+def urls(collection: str = None) -> list:
     """Get URLs of all locations in the collection.
     """
-    return [url(l[0]) for l in get_locations(collection)]
+    return [url(l[0]) for l in _get_locations(collection)]
 
 
 def register_global(name: str, value, overwrite: bool = False):

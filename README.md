@@ -4,6 +4,17 @@
 ## Changelog
 
 
+### 2.0 (2018-06-26)
+
+- New API functions added: `js_tag`, `css_tag`.
+- API functions renamed: `dump_js()` to `js_tags()`, `dump_css()` to
+  `css_tags()`, `add_inline()` to `add_inline_js()`, `dump_inline()` to
+  `inline_js()`.
+- New `tpl`'s globals added: `css_tag()`, `js_tag()`.
+- `tpl`'s globals renamed: `css_links()` to `css_tags()`, `js_links()`
+  to `js_tags()`, `js_head_links()` to `js_head_tags()`.
+
+
 ### 1.8 (2018-06-22)
 
 Support of strings as second argument in `library()`.

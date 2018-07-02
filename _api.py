@@ -37,7 +37,7 @@ _build_timestamps = {}  # type: _Dict[str, str]
 
 _NODE_BIN_DIR = _path.join(_reg.get('paths.root'), 'node_modules', '.bin')
 _REQUIRED_NPM_PACKAGES = [
-    'gulp', 'gulp-rename', 'gulp-ignore', 'gulp-minify', 'gulp-less', 'gulp-cssmin', 'gulp-babel',
+    'gulp', 'gulp-rename', 'gulp-ignore', 'gulp-minify', 'gulp-less', 'gulp-sass', 'gulp-cssmin', 'gulp-babel',
     'babel-preset-es2015', 'gulp-browserify', 'babelify', 'vue', 'vueify', 'babel-plugin-transform-runtime'
 ]
 _GULPFILE = _path.join(_path.realpath(_path.dirname(__file__)), 'gulpfile.js')
@@ -431,6 +431,12 @@ def t_less(location: str, target: str = ''):
     """Add a location to the LESS transform task.
     """
     _add_task(location, 'less', target)
+
+
+def t_scss(location: str, target: str = ''):
+    """Add a location to the SCSS transform task.
+    """
+    _add_task(location, 'scss', target)
 
 
 def t_js(location: str, target: str = '', babelify: bool = False):

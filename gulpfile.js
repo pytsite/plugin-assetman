@@ -74,6 +74,18 @@ function less(stream) {
     return stream;
 }
 
+function scss(stream) {
+    const gulpSass = require('gulp-sass');
+
+    stream = stream.pipe(ignore.include(/\.scss/)).pipe(gulpSass());
+
+    // Minify
+    if (minify)
+        stream = minifyCSS(stream);
+
+    return stream;
+}
+
 
 gulp.task('default', function () {
     const tasksFile = yargs.argv.tasksFile;
@@ -106,6 +118,10 @@ gulp.task('default', function () {
 
                 case 'less':
                     stream = less(stream, task.args);
+                    break;
+
+                case 'scss':
+                    stream = scss(stream, task.args);
                     break;
 
                 case 'js':

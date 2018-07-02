@@ -8,8 +8,10 @@ __license__ = 'MIT'
 from . import _error as error
 from ._api import register_package, library, preload, js_tags, css_tags, url, add_inline_js, inline_js, urls, \
     reset, build, build_translations, build_all, is_package_registered, register_global, t_browserify, t_copy, \
-    t_copy_static, t_less, t_js, t_css, js_module, get_src_dir_path, get_dst_dir_path, npm_update, on_split_location, \
-    js_tag, css_tag
+    t_copy_static, t_less, t_scss, t_js, t_css, js_module, get_src_dir_path, get_dst_dir_path, npm_update, \
+    on_split_location, js_tag, css_tag
+
+from pytsite import semver as _semver
 
 
 def plugin_load():
@@ -70,3 +72,10 @@ def plugin_load_uwsgi():
 
     preload(__name__ + '@require.js', True, head=True)
     preload(__name__ + '@require-config.js', True, head=True)
+
+
+def plugin_update(v_from: _semver.Version):
+    if v_from <= '2.0':
+        # NPM package 'gulp-sass' installation
+        from ._api import setup
+        setup()

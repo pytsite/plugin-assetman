@@ -4,8 +4,92 @@ __author__ = 'Alexander Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from pytsite import console as _console, maintenance as _maintenance
+from pytsite import console as _console, maintenance as _maintenance, lang as _lang
 from . import _api, _error
+
+
+class NpmInstall(_console.Command):
+    """npm:install Console Command.
+    """
+
+    @property
+    def name(self) -> str:
+        """Get name of the command.
+        """
+        return 'npm:install'
+
+    @property
+    def description(self) -> str:
+        """Get description of the command.
+        """
+        return 'assetman@assetman_npm_install_console_command_description'
+
+    @property
+    def signature(self) -> str:
+        return '{} <PACKAGE>...'.format(super().signature)
+
+    def exec(self):
+        if not self.args:
+            return
+
+        try:
+            _maintenance.enable()
+            _console.print_info(_lang.t('assetman@installing_npm_packages', {'packages': ', '.join(self.args)}))
+            _api.npm_install(self.args)
+        except RuntimeError as e:
+            raise _console.error.CommandExecutionError(e)
+        finally:
+            _maintenance.disable()
+
+
+class NpmUpdate(_console.Command):
+    """assetman:setup Console Command.
+    """
+
+    @property
+    def name(self) -> str:
+        """Get name of the command.
+        """
+        return 'npm:update'
+
+    @property
+    def description(self) -> str:
+        """Get description of the command.
+        """
+        return 'assetman@assetman_npm_update_console_command_description'
+
+    def exec(self):
+
+        try:
+            _maintenance.enable()
+            _api.npm_update()
+        finally:
+            _maintenance.disable()
+
+
+class Setup(_console.Command):
+    """assetman:setup Console Command.
+    """
+
+    @property
+    def name(self) -> str:
+        """Get name of the command.
+        """
+        return 'assetman:setup'
+
+    @property
+    def description(self) -> str:
+        """Get description of the command.
+        """
+        return 'assetman@assetman_setup_console_command_description'
+
+    def exec(self):
+
+        try:
+            _maintenance.enable()
+            _api.setup()
+        finally:
+            _maintenance.disable()
 
 
 class Build(_console.Command):

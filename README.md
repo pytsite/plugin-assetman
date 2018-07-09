@@ -4,9 +4,18 @@
 ## Changelog
 
 
+### 2.2 (2018-07-09)
+
+- New console commands added: `assetman:setup`, `npm:install`,
+  `npm:update`.
+- `t_browserify()` API function removed.
+- List of required NPM packages updated.
+- NPM packages installation errors reporting fixed.
+
+
 ### 2.1 (2018-07-02)
 
-Support of SCSS.
+Support of SCSS added.
 
 
 ### 2.0 (2018-06-26)

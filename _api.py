@@ -35,22 +35,20 @@ _globals = {}
 
 _build_timestamps = {}  # type: _Dict[str, str]
 
+_DEBUG = _reg.get('debug', False)
 _NODE_BIN_DIR = _path.join(_reg.get('paths.root'), 'node_modules', '.bin')
 _REQUIRED_NPM_PACKAGES = [
-    'gulp', 'gulp-rename', 'gulp-ignore', 'gulp-minify', 'gulp-less', 'gulp-sass', 'gulp-cssmin', 'gulp-babel',
-    'babel-preset-es2015', 'gulp-browserify', 'babelify', 'vue', 'vueify', 'babel-plugin-transform-runtime'
+    'yargs', 'gulp', 'gulp-rename', 'gulp-ignore', 'gulp-minify', 'gulp-less', 'gulp-sass', 'gulp-cssmin', 'gulp-babel',
+    'babel-core', 'babel-preset-env',
 ]
 _GULPFILE = _path.join(_path.realpath(_path.dirname(__file__)), 'gulpfile.js')
 _GULP_TASKS_FILE = _path.join(_reg.get('paths.tmp'), 'gulp-tasks.json')
 
 
-def _run_process(cmd: list, debug: bool = False) -> _subprocess.CompletedProcess:
+def _run_process(cmd: list, passthrough: bool = False) -> _subprocess.CompletedProcess:
     """Run process.
     """
-    stdout = stderr = _subprocess.PIPE
-
-    if debug and _reg.get('env.type') == 'console':
-        stdout = stderr = None
+    stdout = stderr = _subprocess.PIPE if not passthrough else None
 
     return _subprocess.run(cmd, stdout=stdout, stderr=stderr)
 
@@ -65,13 +63,14 @@ def _run_node_bin(bin_name: str, *args, **kwargs) -> _subprocess.CompletedProces
         args_l.append('--{}={}'.format(k, v))
 
     cmd = ['node', _path.join(_NODE_BIN_DIR, bin_name)] + args_l + list(args)
+    r = _run_process(cmd)
 
     try:
-        r = _run_process(cmd, kwargs.get('debug', False))
         r.check_returncode()
         return r
     except _subprocess.CalledProcessError:
-        raise RuntimeError('None-zero exit status while running command {}'.format(cmd))
+        raise RuntimeError('None-zero exit status while executing "{}":\n\n{}'.
+                           format(' '.join(cmd), r.stderr.decode('utf-8')))
 
 
 def register_package(package_name: str, assets_dir: str = 'res/assets', alias: str = None):
@@ -356,28 +355,34 @@ def check_setup() -> bool:
     return len(r.stdout.decode('utf-8').split('\n')) - 1 >= len(_REQUIRED_NPM_PACKAGES)
 
 
-def setup():
-    """Setup NPM environment
+def npm_install(package: _Union[str, _List[str]]):
+    """Install NPM package(s)
     """
-    cwd = _getcwd()
-
-    # Node modules should be installed exactly to the root of the project to get things work
-    _chdir(_reg.get('paths.root'))
-
     # Check for NPM existence
     if _run_process(['which', 'npm']).returncode != 0:
         raise RuntimeError('NPM executable is not found. Check https://docs.npmjs.com/getting-started/installing-node')
 
-    # Install required NPM packages
-    _console.print_info(_lang.t('assetman@installing_required_npm_packages'))
-    if _run_process(['npm', 'install'] + _REQUIRED_NPM_PACKAGES, _reg.get('debug', False)).returncode != 0:
-        raise RuntimeError('Error while installing NPM packages: {}'.format(_REQUIRED_NPM_PACKAGES))
+    cwd = _getcwd()
 
-    _chdir(cwd)
+    try:
+        # Node modules should be installed exactly to the root of the project to get things work
+        _chdir(_reg.get('paths.root'))
+
+        r = _run_process(['npm', 'install', '--no-save', '--no-audit', '--no-package-lock'] + package, _DEBUG)
+        r.check_returncode()
+
+    except _subprocess.CalledProcessError as e:
+        msg = 'Error while installing required NPM package(s): {}'.format(package)
+        if not _DEBUG:
+            msg += '\n\n{}'.format(e.stderr)
+        raise RuntimeError(msg)
+
+    finally:
+        _chdir(cwd)
 
 
 def npm_update():
-    """Update NPM environment
+    """Update all installed NPM packages
     """
     cwd = _getcwd()
 
@@ -390,10 +395,18 @@ def npm_update():
 
     # Update NPM packages
     _console.print_info(_lang.t('assetman@updating_npm_packages'))
-    if _run_process(['npm', 'update'], _reg.get('debug', False)).returncode != 0:
+    if _run_process(['npm', 'update'], _DEBUG).returncode != 0:
         raise RuntimeError('Error while updating NPM packages')
 
     _chdir(cwd)
+
+
+def setup():
+    """Setup NPM environment
+    """
+    # Install required NPM packages
+    _console.print_info(_lang.t('assetman@installing_required_npm_packages'))
+    npm_install(_REQUIRED_NPM_PACKAGES)
 
 
 def _add_task(location: str, task_name: str, dst: str = '', **kwargs):
@@ -439,16 +452,10 @@ def t_scss(location: str, target: str = ''):
     _add_task(location, 'scss', target)
 
 
-def t_js(location: str, target: str = '', babelify: bool = False):
+def t_js(location: str, target: str = '', babelify: bool = False, source_maps: bool = False):
     """Add a location to the JS transform task.
     """
     _add_task(location, 'js', target, babelify=babelify)
-
-
-def t_browserify(location: str, target: str = '', babelify: bool = False, vueify: bool = False):
-    """Add a location to the browserify transform task.
-    """
-    _add_task(location, 'browserify', target, babelify=babelify, vueify=vueify)
 
 
 def js_module(name: str, location: str, shim: bool = False, deps: list = None, exports: str = None):
@@ -610,8 +617,7 @@ def build(package_name: str):
         f.write(_json.dumps(tasks_file_content))
 
     # Run Gulp
-    _run_node_bin('gulp', '--silent', gulpfile=_GULPFILE, tasksFile=_GULP_TASKS_FILE,
-                  minify=not _reg.get('debug', False))
+    _run_node_bin('gulp', '--silent', gulpfile=_GULPFILE, tasksFile=_GULP_TASKS_FILE, minify=not _DEBUG)
 
     # Update timestamp
     _update_timestamp_config(package_name)

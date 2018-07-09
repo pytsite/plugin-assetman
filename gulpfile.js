@@ -39,7 +39,7 @@ function js(stream, args) {
         const babel = require('gulp-babel');
 
         stream = stream.pipe(babel({
-            presets: ['es2015']
+            presets: ['env']
         }));
     }
 
@@ -126,10 +126,6 @@ gulp.task('default', function () {
 
                 case 'js':
                     stream = js(stream, task.args);
-                    break;
-
-                case 'browserify':
-                    stream = browserify(stream, task.args);
                     break;
 
                 default:

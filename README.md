@@ -4,6 +4,12 @@
 ## Changelog
 
 
+### 2.3 (2018-07-16)
+
+- `String.prototype.startsWith` JS polyfill added.
+- `source_maps` argument removed from `t_js()`.
+
+
 ### 2.2 (2018-07-09)
 
 - New console commands added: `assetman:setup`, `npm:install`,

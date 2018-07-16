@@ -1,9 +1,14 @@
 define(['jquery', 'assetman-build-timestamps', 'assetman-package-aliases', 'assetman-libraries'], function ($, tStamps, pAliases, libraries) {
+    if (!String.prototype.startsWith) {
+        String.prototype.startsWith = function (search, pos) {
+            return this.substr(!pos || pos < 0 ? 0 : +pos, search.length) === search;
+        };
+    }
+
     if (!String.prototype.endsWith) {
         String.prototype.endsWith = function (search, this_len) {
-            if (this_len === undefined || this_len > this.length) {
+            if (this_len === undefined || this_len > this.length)
                 this_len = this.length;
-            }
             return this.substring(this_len - search.length, this_len) === search;
         };
     }
@@ -41,7 +46,7 @@ define(['jquery', 'assetman-build-timestamps', 'assetman-package-aliases', 'asse
             setTimeout(function () {
                 // It is important to pass 'false' as last argument!
                 _loadResource(resType, resLoc, callbackFunc, false);
-                deferred.resolve();
+                deferred.resolve(resLoc);
             }, 0);
 
             return deferred;
@@ -76,7 +81,7 @@ define(['jquery', 'assetman-build-timestamps', 'assetman-package-aliases', 'asse
 
     function load(location, callback, async) {
         if (location in libraries) {
-            $.each(libraries[location], function(index, location) {
+            $.each(libraries[location], function (index, location) {
                 load(location);
             })
         }

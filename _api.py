@@ -452,7 +452,7 @@ def t_scss(location: str, target: str = ''):
     _add_task(location, 'scss', target)
 
 
-def t_js(location: str, target: str = '', babelify: bool = False, source_maps: bool = False):
+def t_js(location: str, target: str = '', babelify: bool = False):
     """Add a location to the JS transform task.
     """
     _add_task(location, 'js', target, babelify=babelify)

@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 2.4 (2018-07-29)
+
+`callback` argument removed from `load*` JS functions.
+
+
 ### 2.3 (2018-07-16)
 
 - `String.prototype.startsWith` JS polyfill added.

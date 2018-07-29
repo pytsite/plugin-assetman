@@ -32,7 +32,7 @@ define(['jquery', 'assetman-build-timestamps', 'assetman-package-aliases', 'asse
         return location.origin + '/assets/' + pkgName + '/' + assetPath + '?v=' + tStamps[pkgName];
     }
 
-    function _loadResource(resType, resLoc, callbackFunc, async) {
+    function _loadResource(resType, resLoc, async) {
         resLoc = assetUrl(resLoc).replace(/\?v=[0-9a-f]+/, '');
 
         // Async is default for CSS but not for JS
@@ -45,7 +45,7 @@ define(['jquery', 'assetman-build-timestamps', 'assetman-package-aliases', 'asse
 
             setTimeout(function () {
                 // It is important to pass 'false' as last argument!
-                _loadResource(resType, resLoc, callbackFunc, false);
+                _loadResource(resType, resLoc, false);
                 deferred.resolve(resLoc);
             }, 0);
 
@@ -66,30 +66,27 @@ define(['jquery', 'assetman-build-timestamps', 'assetman-package-aliases', 'asse
             default:
                 throw 'Unexpected resource type: ' + resType;
         }
-
-        if (callbackFunc)
-            callbackFunc(resLoc);
     }
 
-    function loadCSS(location, callback, async) {
-        return _loadResource('css', location, callback, async)
+    function loadCSS(location, async) {
+        return _loadResource('css', location, async)
     }
 
-    function loadJS(location, callback, async) {
-        return _loadResource('js', location, callback, async)
+    function loadJS(location, async) {
+        return _loadResource('js', location, async)
     }
 
-    function load(location, callback, async) {
+    function load(location, async) {
         if (location in libraries) {
             $.each(libraries[location], function (index, location) {
                 load(location);
             })
         }
         else if (location.endsWith('.css')) {
-            return loadCSS(location, callback, async);
+            return loadCSS(location, async);
         }
         else if (location.endsWith('.js')) {
-            return loadJS(location, callback, async);
+            return loadJS(location, async);
         }
         else {
             throw 'Cannot determine type of asset for location ' + location;

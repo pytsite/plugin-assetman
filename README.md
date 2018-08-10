@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 2.4.1 (2018-08-10)
+
+Typo fixed.
+
+
 ### 2.4 (2018-07-29)
 
 `callback` argument removed from `load*` JS functions.

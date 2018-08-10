@@ -1,14 +1,14 @@
 {
   "name": "assetman",
-  "version": "2.4",
+  "version": "2.4.1",
   "description": {
-    "en": "Aseet Manager",
+    "en": "Asset Manager",
     "ru": "Менеджер ассетов",
     "uk": "Менеджер ассетів"
   },
   "url": "https://github.com/pytsite/plugin-assetman",
   "author": {
-    "name": "Alexander Shepetko",
+    "name": "Oleksandr Shepetko",
     "email": "a@shepetko.com",
     "url": "https://shepetko.com"
   },

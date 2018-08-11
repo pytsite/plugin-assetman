@@ -17,7 +17,7 @@ from . import _error
 
 _package_paths = {}  # type: _Dict[str, _Tuple[str, str]]
 _package_aliases = {}  # type: _Dict[str, str]
-_libraries = {}  # type: _Dict[str, _Union[_List, _Callable[..., _List]]]
+_libraries = {}  # type: _Dict[str, _Union[_List, _Callable[[...], _List]]]
 
 _tasks = []  # type: _List[_Tuple]
 _requirejs_modules = {}  # type: _Dict[str, tuple]
@@ -182,13 +182,13 @@ def preload(location: str, permanent: bool = False, collection: str = None, weig
         raise RuntimeError('Non permanent assets only allowed while processing HTTP requests')
 
     head = kwargs.get('head')
-    async = kwargs.get('async')
+    asynchr = kwargs.get('asynchr')
     defer = kwargs.get('defer')
 
     # Library
     if location in _libraries:
         for asset_location in _libraries[location]:
-            preload(asset_location, permanent, collection, weight, async=async, defer=defer, head=head)
+            preload(asset_location, permanent, collection, weight, asynchr=asynchr, defer=defer, head=head)
         return
 
     # Determine collection
@@ -211,7 +211,7 @@ def preload(location: str, permanent: bool = False, collection: str = None, weig
             elif weight > _last_p_weight:
                 _last_p_weight = weight
 
-            _p_locations[location_hash] = (location, collection, weight, async, defer, head)
+            _p_locations[location_hash] = (location, collection, weight, asynchr, defer, head)
         else:
             if not weight:
                 _last_weight[tid] += 10
@@ -219,7 +219,7 @@ def preload(location: str, permanent: bool = False, collection: str = None, weig
             elif weight > _last_weight[tid]:
                 _last_weight[tid] = weight
 
-            _locations[tid][location_hash] = (location, collection, weight, async, defer, head)
+            _locations[tid][location_hash] = (location, collection, weight, asynchr, defer, head)
 
 
 def add_inline_js(s: str, weight=0):
@@ -263,17 +263,17 @@ def _get_locations(collection: str = None) -> list:
     return locations
 
 
-def js_tag(location: str, async: bool = False, defer: bool = False) -> str:
+def js_tag(location: str, asynchr: bool = False, defer: bool = False) -> str:
     """Get HTML <script> tags for a location
     """
     if location in _libraries:
-        return '\n'.join([js_tag(l, async, defer) for l in _libraries[location] if _detect_collection(l) == 'js'])
+        return '\n'.join([js_tag(l, asynchr, defer) for l in _libraries[location] if _detect_collection(l) == 'js'])
 
     location = _util.escape_html(url(location))
-    async = ' async' if async else ''
+    asynchr = ' async' if asynchr else ''
     defer = ' defer' if defer else ''
 
-    return '<script type="text/javascript" src="{}"{}{}></script>'.format(location, async, defer)
+    return '<script type="text/javascript" src="{}"{}{}></script>'.format(location, asynchr, defer)
 
 
 def js_tags(head: bool = False) -> str:

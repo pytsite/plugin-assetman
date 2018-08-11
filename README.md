@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 2.4.2 (2018-08-11)
+
+Usage of Python 3.7 reserved word `async` fixed.
+
+
 ### 2.4.1 (2018-08-10)
 
 Typo fixed.

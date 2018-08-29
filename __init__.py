@@ -78,7 +78,7 @@ def plugin_load_uwsgi():
 
 
 def plugin_update(v_from: _semver.Version):
-    if v_from <= '2.2':
-        # New required NPM packages added
+    if v_from <= '2.4.3':
+        # Required NPM packages added/updated
         from ._api import setup
         setup()

@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 2.4.4 (2018-08-30)
+
+Babelified JS compilation fixed.
+
+
 ### 2.4.3 (2018-08-30)
 
 Babel installation issue fixed.

@@ -39,7 +39,7 @@ function js(stream, args) {
         const babel = require('gulp-babel');
 
         stream = stream.pipe(babel({
-            presets: ['env']
+            presets: ['@babel/env']
         }));
     }
 

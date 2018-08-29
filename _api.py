@@ -39,7 +39,7 @@ _DEBUG = _reg.get('debug', False)
 _NODE_BIN_DIR = _path.join(_reg.get('paths.root'), 'node_modules', '.bin')
 _REQUIRED_NPM_PACKAGES = [
     'yargs', 'gulp', 'gulp-rename', 'gulp-ignore', 'gulp-minify', 'gulp-less', 'gulp-sass', 'gulp-cssmin', 'gulp-babel',
-    'babel-core', 'babel-preset-env',
+    '@babel/core', '@babel/preset-env', '@babel/polyfill',
 ]
 _GULPFILE = _path.join(_path.realpath(_path.dirname(__file__)), 'gulpfile.js')
 _GULP_TASKS_FILE = _path.join(_reg.get('paths.tmp'), 'gulp-tasks.json')

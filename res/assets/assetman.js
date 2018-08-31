@@ -1,7 +1,7 @@
 define(['jquery', 'assetman-build-timestamps', 'assetman-package-aliases', 'assetman-libraries'], function ($, tStamps, pAliases, libraries) {
     if (!String.prototype.startsWith) {
         String.prototype.startsWith = function (search, pos) {
-            return this.substr(!pos || pos < 0 ? 0 : +pos, search.length) === search;
+            return this.substring(!pos || pos < 0 ? 0 : +pos, search.length) === search;
         };
     }
 
@@ -13,13 +13,23 @@ define(['jquery', 'assetman-build-timestamps', 'assetman-package-aliases', 'asse
         };
     }
 
-    function assetUrl(url) {
-        if (url.indexOf('/') === 0 || url.indexOf('http') === 0)
-            return url;
+    function url(urlStr, query = {}) {
+        const r = urlStr.startsWith('http') ? new URL(urlStr) : new URL(urlStr, window.location.origin);
+        query = Object.assign(parseQueryString(r.search.replace(/^\?/, '')), query);
 
-        var pkgName = 'default';
-        var assetPath = url;
-        var urlParts = url.split('@');
+        if (query)
+            r.search = '?' + $.param(query);
+
+        return r.href;
+    }
+
+    function assetUrl(urlStr) {
+        if (urlStr.indexOf('/') === 0 || urlStr.indexOf('http') === 0)
+            return urlStr;
+
+        let pkgName = 'default';
+        let assetPath = urlStr;
+        const urlParts = urlStr.split('@');
 
         if (urlParts.length === 2) {
             pkgName = urlParts[0];
@@ -41,7 +51,7 @@ define(['jquery', 'assetman-build-timestamps', 'assetman-package-aliases', 'asse
 
         // Call self in async manner
         if (async === true) {
-            var deferred = $.Deferred();
+            const deferred = $.Deferred();
 
             setTimeout(function () {
                 // It is important to pass 'false' as last argument!
@@ -93,47 +103,50 @@ define(['jquery', 'assetman-build-timestamps', 'assetman-package-aliases', 'asse
         }
     }
 
-    function parseLocation(skipEmpty) {
-        function split(s) {
-            var r = {};
+    function parseQueryString(s, skipEmpty = true) {
+        const r = {};
 
-            s = s.split('&');
-            for (var i = 0; i < s.length; ++i) {
-                var part = s[i].split('=');
-                if (part.length === 1 && part[0].length) {
-                    r[decodeURIComponent(part[0])] = null;
+        s = s.split('&');
+        for (let i = 0; i < s.length; ++i) {
+            const part = s[i].split('=');
+            if (part.length === 1 && part[0].length) {
+                r[decodeURIComponent(part[0])] = null;
+            }
+            else if (part.length === 2) {
+                let k = decodeURIComponent(part[0].replace('+', '%20'));
+                let v = decodeURIComponent(part[1].replace('+', '%20'));
+
+                if (k.indexOf('[]') > 0) {
+                    k = k.replace('[]', '');
+
+                    if (k in r && !(r[k] instanceof Array))
+                        r[k] = [r[k]];
+                    else
+                        r[k] = [];
+
+                    r[k].push(v);
                 }
-                else if (part.length === 2) {
-                    var k = decodeURIComponent(part[0].replace('+', '%20'));
-                    var v = decodeURIComponent(part[1].replace('+', '%20'));
-
-                    if (k.indexOf('[]') > 0) {
-                        k = k.replace('[]', '');
-
-                        if (k in r && !(r[k] instanceof Array))
-                            r[k] = [r[k]];
-                        else
-                            r[k] = [];
-
-                        r[k].push(v);
-                    }
-                    else {
-                        r[k] = v;
-                    }
+                else {
+                    r[k] = v;
                 }
             }
-
-            for (var l in r) {
-                if (r[l] instanceof Array && r[l].length === 1)
-                    r[l] = r[l][0];
-
-                if (skipEmpty === true && !r[l])
-                    delete r[l];
-            }
-
-            return r;
         }
 
+        for (let l in r) {
+            if (!r.hasOwnProperty(l))
+                continue;
+
+            if (r[l] instanceof Array && r[l].length === 1)
+                r[l] = r[l][0];
+
+            if (skipEmpty === true && !r[l])
+                delete r[l];
+        }
+
+        return r;
+    }
+
+    function parseLocation() {
         return {
             href: window.location.href,
             origin: window.location.origin,
@@ -141,17 +154,17 @@ define(['jquery', 'assetman-build-timestamps', 'assetman-package-aliases', 'asse
             host: window.location.host,
             port: window.location.port,
             pathname: window.location.pathname,
-            query: split(window.location.search.replace(/^\?/, '')),
-            hash: split(window.location.hash.replace(/^#/, ''))
+            query: parseQueryString(window.location.search.replace(/^\?/, '')),
+            hash: parseQueryString(window.location.hash.replace(/^#/, ''))
         };
     }
 
     function encodeQuery(data) {
-        var r = [];
-        for (var k in data) {
+        let r = [];
+        for (let k in data) {
             if (data.hasOwnProperty(k)) {
                 if (data.k instanceof Array) {
-                    for (var l = 0; l < data.k.length; l++) {
+                    for (let l = 0; l < data.k.length; l++) {
                         r.push(encodeURIComponent(k) + "[]=" + encodeURIComponent(data[k][l]));
                     }
                 }
@@ -169,10 +182,12 @@ define(['jquery', 'assetman-build-timestamps', 'assetman-package-aliases', 'asse
     }
 
     return {
+        url: url,
         assetUrl: assetUrl,
         loadJS: loadJS,
         loadCSS: loadCSS,
         load: load,
+        parseQueryString: parseQueryString,
         parseLocation: parseLocation,
         encodeQuery: encodeQuery,
         definePackageAlias: definePackageAlias

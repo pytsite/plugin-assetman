@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 2.5 (2018-08-31)
+
+New JavaScript methods: `url()`, `parseQueryString()`.
+
+
 ### 2.4.4 (2018-08-30)
 
 Babelified JS compilation fixed.

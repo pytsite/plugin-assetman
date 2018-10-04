@@ -4,6 +4,17 @@
 ## Changelog
 
 
+### 3.0 (2018-10-04)
+
+- Gulp replaced with Webpack.
+- Automatic plugins assets directories registration added,
+- API functions removed: `library()`, `urls()`, `register_global()`,
+  `t_copy()`, `t_copy_static()`, `t_less()`, `t_scss()`, `t_js()`,
+  `t_css()`, `js_module()`, `npm_update()`.
+- `get_src_dir_path()` renamed to `assets_src()`, `get_dst_dir_path()`
+  renamed to `assets_dst()`.
+
+
 ### 2.5 (2018-08-31)
 
 New JavaScript methods: `url()`, `parseQueryString()`.

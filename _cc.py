@@ -22,7 +22,7 @@ class NpmInstall(_console.Command):
     def description(self) -> str:
         """Get description of the command.
         """
-        return 'assetman@assetman_npm_install_console_command_description'
+        return 'assetman@npm_install_console_command_description'
 
     @property
     def signature(self) -> str:
@@ -38,31 +38,6 @@ class NpmInstall(_console.Command):
             _api.npm_install(self.args)
         except RuntimeError as e:
             raise _console.error.CommandExecutionError(e)
-        finally:
-            _maintenance.disable()
-
-
-class NpmUpdate(_console.Command):
-    """assetman:setup Console Command.
-    """
-
-    @property
-    def name(self) -> str:
-        """Get name of the command.
-        """
-        return 'npm:update'
-
-    @property
-    def description(self) -> str:
-        """Get description of the command.
-        """
-        return 'assetman@assetman_npm_update_console_command_description'
-
-    def exec(self):
-
-        try:
-            _maintenance.enable()
-            _api.npm_update()
         finally:
             _maintenance.disable()
 
@@ -99,6 +74,7 @@ class Build(_console.Command):
     def __init__(self):
         super().__init__()
 
+        self.define_option(_console.option.Bool('debug'))
         self.define_option(_console.option.Bool('no-maint'))
 
     @property
@@ -117,6 +93,7 @@ class Build(_console.Command):
         """Execute The Command.
         """
         maint = not self.opt('no-maint')
+        debug = self.opt('debug')
 
         try:
             if maint:
@@ -125,9 +102,9 @@ class Build(_console.Command):
             packages = self.args
             if packages:
                 for package in packages:
-                    _api.build(package)
+                    _api.build(package, debug)
             else:
-                _api.build_all()
+                _api.build_all(debug)
 
         except (RuntimeError, _error.PackageNotRegistered, _error.PackageAlreadyRegistered) as e:
             raise _console.error.CommandExecutionError(e)

@@ -1,0 +1,24 @@
+{
+  "name": "@pytsite/assetman",
+  "main": "index.js",
+  "dependencies": {
+    "@babel/core": "7.x",
+    "@babel/plugin-transform-runtime": "7.x",
+    "@babel/preset-env": "7.x",
+    "@babel/runtime": "7.x",
+    "babel-loader": "8.x",
+    "css-loader": "1.x",
+    "file-loader": "2.x",
+    "less": "3.x",
+    "less-loader": "4.x",
+    "mini-css-extract-plugin": "0.x",
+    "node-sass": "4.x",
+    "optimize-css-assets-webpack-plugin": "5.x",
+    "sass-loader": "7.x",
+    "style-loader": "0.x",
+    "uglifyjs-webpack-plugin": "2.x",
+    "webpack": "4.x",
+    "webpack-cli": "3.x",
+    "webpack-merge": "4.x"
+  }
+}

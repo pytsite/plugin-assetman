@@ -1,5 +1,4 @@
 npm_install_console_command_description: 'Встановлення пакетів NPM'
-npm_update_console_command_description: 'Оновлення пакетів NPM'
 assetman_setup_console_command_description: 'Налаштування оточення assetman'
 assetman_build_console_command_description: 'Компіляція ассетів'
 compiling_assets: 'Компілюю ассети'

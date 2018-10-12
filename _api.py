@@ -188,6 +188,8 @@ def setup():
     dev_host_npm_packages_dir = _path.join(root_dir, 'npm_packages')
     is_dev_host = _path.isdir(dev_host_npm_packages_dir)
 
+    _makedirs(node_modules_subdir, 0o755, True)
+
     # Create symlinks in node_modules from npm_packages
     if is_dev_host:
         for name in _listdir(dev_host_npm_packages_dir):

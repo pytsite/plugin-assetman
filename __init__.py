@@ -7,7 +7,8 @@ __license__ = 'MIT'
 # Public API
 from . import _error as error
 from ._api import register_package, url, inline_js, reset, build, build_translations, build_all, js, css, \
-    is_package_registered, assets_src, assets_dst, on_split_location
+    is_package_registered, assets_src, assets_dst, on_split_location, assets_public_path, npm_install, setup, \
+    resolve_package
 
 # Local imports
 from pytsite import semver as _semver
@@ -32,7 +33,7 @@ def plugin_pre_install():
 def plugin_install():
     from . import _api
 
-    _api.build(__name__)
+    _api.build_all()
 
 
 def plugin_load_console():

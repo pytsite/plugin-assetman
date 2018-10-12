@@ -4,6 +4,12 @@
 ## Changelog
 
 
+### 4.1 (2018-10-12)
+
+- Missing functions exposed to the public API.
+- Plugin installation hooks fixed.
+
+
 ### 4.0 (2018-10-12)
 
 - `js_tag()` renamed to `js()`, `css_tag()` renamed to `css()`.

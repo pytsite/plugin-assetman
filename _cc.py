@@ -4,8 +4,10 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from pytsite import console as _console, maintenance as _maintenance, lang as _lang
+from pytsite import console as _console, maintenance as _maintenance, lang as _lang, reg as _reg
 from . import _api, _error
+
+_DEV_MODE = _reg.get('debug', False)
 
 
 class NpmInstall(_console.Command):
@@ -74,7 +76,7 @@ class Build(_console.Command):
     def __init__(self):
         super().__init__()
 
-        self.define_option(_console.option.Bool('debug'))
+        self.define_option(_console.option.Bool('debug', default=_DEV_MODE))
         self.define_option(_console.option.Bool('no-maint'))
 
     @property

@@ -6,7 +6,7 @@ __license__ = 'MIT'
 
 import subprocess as _subprocess
 import json as _json
-from typing import Dict as _Dict, List as _List, Tuple as _Tuple, Union as _Union
+from typing import Dict as _Dict, List as _List, Tuple as _Tuple, Union as _Union, Optional as _Optional
 from os import path as _path, chdir as _chdir, makedirs as _makedirs, getcwd as _getcwd, symlink as _symlink, \
     mkdir as _mkdir, listdir as _listdir
 from shutil import rmtree as _rmtree
@@ -17,14 +17,7 @@ from . import _error
 
 _packages = {}  # type: _Dict[str, _Tuple[str, str]]
 
-_locations = {}
-_last_weight = {}
-
-_p_locations = {}  # Permanent locations
-_last_p_weight = 0
-
 _inline_js = {}
-_last_i_weight = {}
 
 _DEV_MODE = _reg.get('debug', False)
 _NODE_BIN_DIR = _path.join(_reg.get('paths.root'), 'node_modules', '.bin')
@@ -107,94 +100,13 @@ def assets_public_path(package_name: str) -> str:
     return '/assets/{}/'.format(resolve_package(package_name))
 
 
-def preload(location: str, permanent: bool = False, collection: str = None, weight: int = 0, **kwargs):
-    """Preload an asset
-    """
-    if not permanent and not _router.request():
-        raise RuntimeError('Non permanent assets only allowed while processing HTTP requests')
-
-    head = kwargs.get('head')
-    asynchr = kwargs.get('asynchr')
-    defer = kwargs.get('defer')
-
-    # Determine collection
-    if not collection:
-        if '.js' in location:
-            collection = 'js'
-        elif '.css' in location:
-            collection = 'css'
-        else:
-            raise ValueError("Cannot determine collection of location '{}'.".format(location))
-
-    tid = _threading.get_id()
-    if tid not in _locations:
-        _locations[tid] = {}
-
-    location_hash = _util.md5_hex_digest(str(location))
-
-    if location_hash not in _p_locations and location_hash not in _locations[tid]:
-        if permanent:
-            global _last_p_weight
-
-            if not weight:
-                _last_p_weight += 10
-                weight = _last_p_weight
-            elif weight > _last_p_weight:
-                _last_p_weight = weight
-
-            _p_locations[location_hash] = (location, collection, weight, asynchr, defer, head)
-        else:
-            if not weight:
-                _last_weight[tid] += 10
-                weight = _last_weight[tid]
-            elif weight > _last_weight[tid]:
-                _last_weight[tid] = weight
-
-            _locations[tid][location_hash] = (location, collection, weight, asynchr, defer, head)
-
-
-def add_inline_js(s: str, weight=0):
-    """Add a code which intended to output in the HTTP response body
-    """
-    tid = _threading.get_id()
-
-    if not weight:
-        _last_i_weight[tid] += 10
-    elif weight > _last_i_weight[tid]:
-        _last_i_weight[tid] = weight
-
-    _inline_js[tid].append((s, weight))
-
-
 def reset():
-    """Remove all previously added locations and inline code except 'permanent'.
+    """Reset
     """
-    global _last_weight
-
-    tid = _threading.get_id()
-
-    _locations[tid] = {}
-    _last_weight[tid] = 0
-    _inline_js[tid] = []
-    _last_i_weight[tid] = 0
+    _inline_js[_threading.get_id()] = []
 
 
-def _get_locations(collection: str = None) -> list:
-    tid = _threading.get_id()
-
-    p_locations = _p_locations.values()
-    locations = _locations[tid].values()
-
-    locations = sorted(p_locations, key=lambda x: x[2]) + sorted(locations, key=lambda x: x[2])
-
-    # Filter by collection
-    if collection:
-        locations = [l for l in locations if l[1] == collection]
-
-    return locations
-
-
-def js_tag(location: str, asynchr: bool = False, defer: bool = False) -> str:
+def js(location: str, asynchr: bool = False, defer: bool = False) -> str:
     """Get HTML <script> tags for a location
     """
     location = _util.escape_html(url(location))
@@ -204,38 +116,25 @@ def js_tag(location: str, asynchr: bool = False, defer: bool = False) -> str:
     return '<script type="text/javascript" src="{}"{}{}></script>'.format(location, asynchr, defer)
 
 
-def js_tags(head: bool = False) -> str:
-    """Get HTML <script> tags for all preloaded links
-    """
-    r = ''
-    for l_info in _get_locations('js'):
-        if (not head and not l_info[5]) or (head and l_info[5]):
-            r += js_tag(l_info[0], l_info[3], l_info[4]) + '\n'
-
-    return r
-
-
-def css_tag(location: str) -> str:
+def css(location: str) -> str:
     """Get HTML <link rel="stylesheet"> tag for a location
     """
     return '<link rel="stylesheet" href="{}">'.format(_util.escape_html(url(location)))
 
 
-def css_tags() -> str:
-    """Get HTML <link rel="stylesheet"> tags of preloaded locations
-    """
-    return '\n'.join([css_tag(l_info[0]) for l_info in _get_locations('css')])
-
-
-def inline_js() -> str:
-    r = ''
-
+def inline_js(s: str = None) -> _Optional[str]:
     tid = _threading.get_id()
-    if tid in _inline_js:
-        for item in sorted(_inline_js[tid], key=lambda x: x[1]):
-            r += item[0]
 
-    return r
+    if s:
+        _inline_js[tid].append(s)
+    else:
+        r = ''
+
+        if tid in _inline_js:
+            for item in _inline_js[tid]:
+                r += item[0]
+
+        return r
 
 
 def url(location: str) -> str:

@@ -6,9 +6,10 @@ __license__ = 'MIT'
 
 # Public API
 from . import _error as error
-from ._api import register_package, preload, js_tags, css_tags, url, add_inline_js, inline_js, reset, build, \
-    build_translations, build_all, is_package_registered, assets_src, assets_dst, on_split_location, js_tag, css_tag
+from ._api import register_package, url, inline_js, reset, build, build_translations, build_all, js, css, \
+    is_package_registered, assets_src, assets_dst, on_split_location
 
+# Local imports
 from pytsite import semver as _semver
 
 
@@ -47,11 +48,8 @@ def plugin_load_wsgi():
     from pytsite import router, tpl
 
     tpl.register_global('asset_url', url)
-    tpl.register_global('css_tag', css_tag)
-    tpl.register_global('css_tags', css_tags)
-    tpl.register_global('js_tag', js_tag)
-    tpl.register_global('js_tags', js_tags)
-    tpl.register_global('js_head_tags', lambda: js_tags(head=True))
+    tpl.register_global('css', css)
+    tpl.register_global('js', js)
     tpl.register_global('inline_js', inline_js)
 
     router.on_dispatch(reset, -999, '*')

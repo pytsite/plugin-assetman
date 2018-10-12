@@ -1,6 +1,6 @@
 {
   "name": "assetman",
-  "version": "3.0",
+  "version": "4.0",
   "description": {
     "en": "Asset Manager",
     "ru": "Менеджер ассетов",
@@ -13,6 +13,6 @@
     "url": "https://shepetko.com"
   },
   "requires": {
-    "pytsite": "8.x"
+    "pytsite": ">=8"
   }
 }

@@ -4,6 +4,14 @@
 ## Changelog
 
 
+### 4.0 (2018-10-12)
+
+- `js_tag()` renamed to `js()`, `css_tag()` renamed to `css()`.
+- API functions removed: `preload()`, `add_inline_js()`, `js_tags()`,
+  `css_tags()`.
+- `--debug` option behavior of console command `assetman:build` fixed.
+
+
 ### 3.0 (2018-10-04)
 
 - Gulp replaced with Webpack.

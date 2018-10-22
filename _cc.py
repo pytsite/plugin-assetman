@@ -76,7 +76,9 @@ class Build(_console.Command):
     def __init__(self):
         super().__init__()
 
+        self.define_option(_console.option.Str('mode', default='development' if _DEV_MODE else 'production'))
         self.define_option(_console.option.Bool('debug', default=_DEV_MODE))
+        self.define_option(_console.option.Bool('watch'))
         self.define_option(_console.option.Bool('no-maint'))
 
     @property
@@ -96,21 +98,32 @@ class Build(_console.Command):
         """
         maint = not self.opt('no-maint')
         debug = self.opt('debug')
+        mode = self.opt('mode')
+        watch = self.opt('watch')
+
+        if watch and not self.args:
+            raise _console.error.CommandExecutionError('--watch option must be used only with package name')
 
         try:
-            if maint:
+            if maint and not watch:
                 _maintenance.enable()
 
             packages = self.args
             if packages:
+                if len(packages) > 1:
+                    watch = False
+
                 for package in packages:
-                    _api.build(package, debug)
+                    _api.build(package, debug, mode, watch)
             else:
-                _api.build_all(debug)
+                _api.build_all(debug, mode)
 
         except (RuntimeError, _error.PackageNotRegistered, _error.PackageAlreadyRegistered) as e:
             raise _console.error.CommandExecutionError(e)
 
+        except KeyboardInterrupt:
+            _console.print_info('')
+
         finally:
-            if maint:
+            if maint and not watch:
                 _maintenance.disable()

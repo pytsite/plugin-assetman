@@ -1,10 +1,6 @@
-const $ = require('jquery');
-const assetman = require('@pytsite/assetman');
+import $ from 'jquery';
 
-let translations = {};
-$.get(assetman.assetUrl('assetman@translations.json')).done(data => {
-    translations = data;
-});
+const translations = require('../../../../static/assets/plugins.assetman/translations.json');
 
 function current() {
     return document.documentElement.getAttribute('lang');
@@ -37,14 +33,18 @@ function t(msg_id, args, language) {
 
     // If package is not found in translations for given language
     if (!(pkg in translations.translations[language])) {
-        if (language !== fallback()) {
+        if (!pkg.startsWith('plugins.')) {
+            // Try to search translation with 'plugins' package name
+            return t(`plugins.${pkg}@${msg_id}`);
+        }
+        else if (language !== fallback()) {
             // Try to translate via fallback language
-            return t(pkg + '@' + msg_id, args, fallback());
+            return t(`${pkg}@${msg_id}`, args, fallback());
         }
         else {
             // Return string as is
-            console.warn("Translations is not found for package '" + pkg + "', language '" + language + "'");
-            return pkg + '@' + msg_id;
+            console.warn(`Translations is not found for package '${pkg}', language '${language}'`);
+            return `${pkg}@${msg_id}`;
         }
     }
 
@@ -55,12 +55,12 @@ function t(msg_id, args, language) {
     if (!(msg_id in pkg_strings)) {
         if (language !== fallback()) {
             // Try to translate via fallback language
-            return t(pkg + '@' + msg_id, args, fallback());
+            return t(`${pkg}@${msg_id}`, args, fallback());
         }
         else {
             // Return string as is
             console.warn("Translation message ID '" + msg_id + "' is not found for package '" + pkg + "', language '" + language + "'");
-            return pkg + '@' + msg_id;
+            return `${pkg}@${msg_id}`;
         }
     }
 
@@ -68,14 +68,15 @@ function t(msg_id, args, language) {
     let translation = pkg_strings[msg_id];
     for (let k in args) {
         if (args.hasOwnProperty(k))
-            translation = translation.replace(':' + k, args[k]);
+            translation = translation.replace(`:${k}`, args[k]);
     }
 
     return translation;
 }
 
-window.lang = {
+const api = {
     current: current,
-    fallback: fallback,
     t: t,
 };
+
+export default api;

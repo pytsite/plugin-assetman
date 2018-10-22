@@ -1,19 +1,5 @@
-import './lang';
-const $ = require('jquery');
-
-if (!String.prototype.startsWith) {
-    String.prototype.startsWith = function (search, pos) {
-        return this.substring(!pos || pos < 0 ? 0 : +pos, search.length) === search;
-    };
-}
-
-if (!String.prototype.endsWith) {
-    String.prototype.endsWith = function (search, this_len) {
-        if (this_len === undefined || this_len > this.length)
-            this_len = this.length;
-        return this.substring(this_len - search.length, this_len) === search;
-    };
-}
+import $ from 'jquery';
+import lang from './lang';
 
 function url(urlStr, query = {}) {
     const r = urlStr.startsWith('http') ? new URL(urlStr) : new URL(urlStr, window.location.origin);
@@ -171,4 +157,16 @@ function encodeQuery(data) {
     return r.join("&");
 }
 
-export {url, assetUrl, loadJS, loadCSS, load, parseQueryString, parseLocation, encodeQuery}
+const api = {
+    url: url,
+    assetUrl: assetUrl,
+    loadJS: loadJS,
+    loadCSS: loadCSS,
+    load: load,
+    parseQueryString: parseQueryString,
+    parseLocation: parseLocation,
+    encodedQuery: encodeQuery
+};
+
+export {lang};
+export default api;

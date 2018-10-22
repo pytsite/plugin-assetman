@@ -12,12 +12,12 @@ from os import path as _path, chdir as _chdir, makedirs as _makedirs, getcwd as 
 from shutil import rmtree as _rmtree
 from importlib.util import find_spec as _find_spec
 from pytsite import router as _router, threading as _threading, util as _util, reg as _reg, console as _console, \
-    lang as _lang, events as _events, logger as _logger
+    lang as _lang, events as _events, logger as _logger, package_info as _package_info
 from . import _error
 
 _packages = {}  # type: _Dict[str, _Tuple[str, str]]
-
 _inline_js = {}
+_building_translations = []
 
 _DEV_MODE = _reg.get('debug', False)
 _NODE_BIN_DIR = _path.join(_reg.get('paths.root'), 'node_modules', '.bin')
@@ -51,10 +51,6 @@ def register_package(package_name: str, assets_dir: str = 'res/assets'):
     if not pkg_spec:
         raise RuntimeError("Package '{}' is not found".format(package_name))
 
-    # Shorten name for plugins
-    if package_name.startswith('plugins.'):
-        package_name = package_name.split('.')[1]
-
     # Check whether assetman's package is already registered
     if package_name in _packages:
         raise _error.PackageAlreadyRegistered(package_name)
@@ -73,17 +69,24 @@ def register_package(package_name: str, assets_dir: str = 'res/assets'):
     _packages[package_name] = (src_path, dst_path)
 
 
-def is_package_registered(package_name: str):
+def is_package_registered(package_name: str) -> bool:
     """Check if the package is registered.
     """
-    return package_name in _packages
+    try:
+        return bool(resolve_package(package_name))
+    except _error.PackageNotRegistered:
+        return False
 
 
 def resolve_package(package_name: str) -> str:
     """Check whether package is registered
     """
     if package_name not in _packages:
-        raise _error.PackageNotRegistered(package_name)
+        plugin_package_name = 'plugins.' + package_name
+        if plugin_package_name in _packages:
+            package_name = plugin_package_name
+        else:
+            raise _error.PackageNotRegistered(package_name)
 
     return package_name
 
@@ -144,6 +147,7 @@ def url(location: str) -> str:
         return location
 
     package_name, asset_path = _split_location(location)
+    package_name = resolve_package(package_name)
 
     return _router.url('/assets/{}/{}'.format(package_name, asset_path), add_lang_prefix=False)
 
@@ -230,50 +234,71 @@ def setup():
     npm_install(npm_pkgs_to_install)
 
 
-def build_translations():
+def build_translations(pkg_name: str):
     """Compile translations
     """
-    from pytsite import console
-    console.print_info(_lang.t('assetman@compiling_translations'))
+    # Manage with recursive calls
+    if pkg_name in _building_translations:
+        return
 
-    translations = {}
-    for lang_code in _lang.langs():
-        translations[lang_code] = {}
-        for pkg_name, info in _lang.get_packages().items():
-            _logger.debug('Compiling translations for {} ({})'.format(pkg_name, lang_code))
-            translations[lang_code][pkg_name] = _lang.get_package_translations(pkg_name, lang_code)
+    _building_translations.append(pkg_name)
 
-    # Write translations to static file
+    # Build dependencies
+    for dep_pkg_name in _package_info.requires_plugins(pkg_name):
+        dep_pkg_name = 'plugins.' + dep_pkg_name
+        if _lang.is_package_registered(dep_pkg_name):
+            build_translations(dep_pkg_name)
+
     output_file = _path.join(assets_dst('assetman'), 'translations.json')
-    output_dir = _path.dirname(output_file)
 
+    # Prepare data structure
+    if _path.exists(output_file):
+        data = _util.load_json(output_file)
+    else:
+        data = {'langs': {}, 'translations': {}}
+
+    # Update languages information
+    data['langs'] = _lang.langs()
+
+    # Build translations structure
+    for lang_code in _lang.langs():
+        if lang_code not in data['translations']:
+            data['translations'][lang_code] = {}
+        _logger.info('Compiling translations for {} ({})'.format(pkg_name, lang_code))
+        data['translations'][lang_code][pkg_name] = _lang.get_package_translations(pkg_name, lang_code)
+
+    # Create output directory
+    output_dir = _path.dirname(output_file)
     if not _path.exists(output_dir):
         _makedirs(output_dir, 0o755, True)
 
+    # Write translations to teh file
     with open(output_file, 'wt', encoding='utf-8') as f:
         _logger.debug("Writing translations into '{}'".format(output_file))
-        f.write(_json.dumps({
-            'langs': _lang.langs(),
-            'translations': translations,
-        }))
+        f.write(_json.dumps(data))
 
 
-def build(pkg_name: str, debug: bool = _DEV_MODE):
+def build(pkg_name: str, debug: bool = _DEV_MODE, mode: str = None, watch: bool = False):
     """Compile assets
     """
     pkg_name = resolve_package(pkg_name)
     src = assets_src(pkg_name)
     dst = assets_dst(pkg_name)
     public_path = assets_public_path(pkg_name)
-    mode = 'development' if _DEV_MODE else 'production'
+    mode = mode or ('development' if _DEV_MODE else 'production')
 
     # Clear destination directory
     if _path.exists(dst):
         _rmtree(dst)
 
+    # Check existence of webpack.config
     webpack_config = _path.join(src, 'webpack.config.js')
     if not _path.exists(webpack_config):
         return
+
+    # Build translations
+    if _lang.is_package_registered(pkg_name):
+        build_translations(pkg_name)
 
     # Run webpack
     _console.print_info(_lang.t('assetman@compiling_assets_for_package', {'package': pkg_name}))
@@ -285,11 +310,13 @@ def build(pkg_name: str, debug: bool = _DEV_MODE):
         '--output-public-path', public_path,
         '--env.NODE_ENV', 'development' if _DEV_MODE else 'production',
         '--env.plugins_dir', _reg.get('paths.plugins'),
+        '--watch', str(watch).lower(),
     ]
-    _run_node_bin('webpack-cli', args, debug)
+
+    _run_node_bin('webpack-cli', args, watch or debug)
 
 
-def build_all(debug: bool = _DEV_MODE):
+def build_all(debug: bool = _DEV_MODE, mode: str = None):
     _console.print_info(_lang.t('assetman@compiling_assets'))
 
     assets_static_path = _reg.get('paths.assets')
@@ -306,9 +333,7 @@ def build_all(debug: bool = _DEV_MODE):
         _rmtree(assets_static_path)
 
     for pkg_name in _packages:
-        build(pkg_name, debug)
-
-    build_translations()
+        build(pkg_name, debug, mode)
 
 
 def on_split_location(handler, priority: int = 0):

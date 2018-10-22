@@ -4,6 +4,14 @@
 ## Changelog
 
 
+### 5.0 (2018-10-22)
+
+- New `assetman:build` console command options: `mode` and `watch`.
+- Translations building refactored.
+- `lang` browser global replaced with module-exported property.
+- React and Babel are required dependencies now.
+
+
 ### 4.1 (2018-10-12)
 
 - Missing functions exposed to the public API.

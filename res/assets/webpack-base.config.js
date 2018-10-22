@@ -10,23 +10,32 @@ module.exports = env => {
 
     let config = {
         entry: [],
-        output: {
-            filename: "main.js"
+        output: {},
+        optimization: {
+            splitChunks: {
+                chunks: 'all',
+            }
         },
-        // TODO
-        // optimization: {
-        //     splitChunks: {
-        //         chunks: 'all'
-        //     }
-        // },
         plugins: [
-            new MiniCssExtractPlugin({
-                filename: "[name].css",
-                chunkFilename: "[id].css"
-            })
+            new MiniCssExtractPlugin(),
         ],
         module: {
             rules: [
+                {
+                    test: /\.m?js$/,
+                    exclude: /(node_modules|bower_components)/,
+                    use: {
+                        loader: 'babel-loader',
+                        options: {
+                            presets: ['@babel/preset-env', '@babel/preset-react'],
+                            plugins: [
+                                '@babel/plugin-proposal-class-properties',
+                                '@babel/plugin-transform-runtime',
+                                '@babel/plugin-syntax-dynamic-import',
+                            ],
+                        }
+                    }
+                },
                 {
                     test: /\.(jpg|jpeg|png|svg)$/,
                     loader: 'file-loader',
@@ -70,28 +79,18 @@ module.exports = env => {
 
     if (!devMode) {
         config = webpackMerge(config, {
-            module: {
-                rules: [
-                    {
-                        test: /\.m?js$/,
-                        exclude: /(node_modules|bower_components)/,
-                        use: {
-                            loader: 'babel-loader',
-                            options: {
-                                presets: ['@babel/preset-env'],
-                                plugins: ['@babel/plugin-transform-runtime'],
-                            }
-                        }
-                    }
-                ],
-            },
             optimization: {
                 minimizer: [
                     new UglifyJsPlugin({
                         cache: true,
                         parallel: true,
+                        extractComments: true,
                     }),
-                    new OptimizeCSSAssetsPlugin({})
+                    new OptimizeCSSAssetsPlugin({
+                        cssProcessorOptions: {
+                            discardComments: {removeAll: true},
+                        }
+                    })
                 ]
             },
         });

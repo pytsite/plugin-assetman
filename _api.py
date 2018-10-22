@@ -131,13 +131,7 @@ def inline_js(s: str = None) -> _Optional[str]:
     if s:
         _inline_js[tid].append(s)
     else:
-        r = ''
-
-        if tid in _inline_js:
-            for item in _inline_js[tid]:
-                r += item[0]
-
-        return r
+        return ''.join(_inline_js[tid]) if tid in _inline_js else ''
 
 
 def url(location: str) -> str:

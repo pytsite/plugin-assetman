@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.0.1 (2018-10-22)
+
+`inline_js()` fixed.
+
+
 ### 5.0 (2018-10-22)
 
 - New `assetman:build` console command options: `mode` and `watch`.

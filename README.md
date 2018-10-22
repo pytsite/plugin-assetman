@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.1 (2018-10-22)
+
+Webpack's `circular-dependency-plugin` added.
+
+
 ### 5.0.1 (2018-10-22)
 
 `inline_js()` fixed.

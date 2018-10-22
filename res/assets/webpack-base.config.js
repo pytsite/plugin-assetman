@@ -4,6 +4,7 @@ const webpackMerge = require('webpack-merge');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const CircularDependencyPlugin = require('circular-dependency-plugin');
 
 module.exports = env => {
     const devMode = env.NODE_ENV !== 'production';
@@ -18,6 +19,14 @@ module.exports = env => {
         },
         plugins: [
             new MiniCssExtractPlugin(),
+            new CircularDependencyPlugin({
+                // exclude detection of files based on a RegExp
+                exclude: /node_modules/,
+                // add errors to webpack instead of warnings
+                failOnError: true,
+                // set the current working directory for displaying module paths
+                cwd: process.cwd(),
+            })
         ],
         module: {
             rules: [

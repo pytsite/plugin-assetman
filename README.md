@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.1.1 (2018-10-23)
+
+Typo fixed.
+
+
 ### 5.1 (2018-10-22)
 
 Webpack's `circular-dependency-plugin` added.

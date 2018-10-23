@@ -165,7 +165,7 @@ const api = {
     load: load,
     parseQueryString: parseQueryString,
     parseLocation: parseLocation,
-    encodedQuery: encodeQuery
+    encodeQuery: encodeQuery
 };
 
 export {lang};

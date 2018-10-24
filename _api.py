@@ -302,7 +302,7 @@ def build(pkg_name: str, debug: bool = _DEV_MODE, mode: str = None, watch: bool 
         '--context', assets_src(pkg_name),
         '--output-path', dst,
         '--output-public-path', public_path,
-        '--env.NODE_ENV', 'development' if _DEV_MODE else 'production',
+        '--env.NODE_ENV', mode,
         '--env.plugins_dir', _reg.get('paths.plugins'),
         '--watch', str(watch).lower(),
     ]

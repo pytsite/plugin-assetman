@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.1.3 (2018-10-28)
+
+Webpack's configuration parts collecting issue fixed.
+
+
 ### 5.1.2 (2018-10-24)
 
 Webpack's mode setting issue fixed.

@@ -105,10 +105,10 @@ module.exports = env => {
         });
     }
 
-    fs.readdirSync(env.plugins_dir).forEach((val) => {
-        const configPart = path.join(env.plugins_dir, val, 'res', 'assets', 'webpack.part.js');
-        if (fs.existsSync(configPart))
-            config = webpackMerge(config, require(configPart));
+    // Merge parts
+    env.config_parts.split(',').forEach(part => {
+        const configPart = path.join(env.root_dir, part, 'webpack.part.js');
+        config = webpackMerge(config, require(configPart));
     });
 
     return config;

@@ -294,6 +294,12 @@ def build(pkg_name: str, debug: bool = _DEV_MODE, mode: str = None, watch: bool 
     if _lang.is_package_registered(pkg_name):
         build_translations(pkg_name)
 
+    webpack_parts = []
+    root_dir = _reg.get('paths.root') + '/'
+    for p in _packages.values():
+        if _path.exists(_path.join(p[0], 'webpack.part.js')):
+            webpack_parts.append(p[0].replace(root_dir, ''))
+
     # Run webpack
     _console.print_info(_lang.t('assetman@compiling_assets_for_package', {'package': pkg_name}))
     args = [
@@ -303,7 +309,8 @@ def build(pkg_name: str, debug: bool = _DEV_MODE, mode: str = None, watch: bool 
         '--output-path', dst,
         '--output-public-path', public_path,
         '--env.NODE_ENV', mode,
-        '--env.plugins_dir', _reg.get('paths.plugins'),
+        '--env.root_dir', root_dir,
+        '--env.config_parts', ','.join(webpack_parts),
         '--watch', str(watch).lower(),
     ]
 

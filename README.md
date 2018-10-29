@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.1.4 (2018-10-29)
+
+Automatic app's package resources registration fixed.
+
+
 ### 5.1.3 (2018-10-28)
 
 Webpack's configuration parts collecting issue fixed.

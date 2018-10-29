@@ -16,11 +16,12 @@ from pytsite import semver as _semver
 
 def plugin_load():
     from os import path
-    from pytsite import reg, plugman
+    from pytsite import reg, plugman, on_app_load
     from . import _eh
 
     reg.put('paths.assets', path.join(reg.get('paths.static'), 'assets'))
     plugman.on_pre_load(_eh.on_plugman_pre_load)
+    on_app_load(_eh.on_app_load)
     _api.register_package(__name__)
 
 

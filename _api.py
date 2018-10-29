@@ -197,7 +197,7 @@ def setup():
                 if not _path.exists(dst):
                     _symlink(src, dst)
 
-    # Create symlinks in node_modules from plugins
+    # Create symlinks in node_modules from registered packages which have package.json
     for pkg_name in _packages:
         src_dir = assets_src(pkg_name)
         if not _path.exists(_path.join(src_dir, 'package.json')):

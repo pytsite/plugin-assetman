@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.1.5 (2018-10-31)
+
+Building language translations fixed.
+
+
 ### 5.1.4 (2018-10-29)
 
 Automatic app's package resources registration fixed.

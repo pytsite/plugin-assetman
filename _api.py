@@ -281,18 +281,18 @@ def build(pkg_name: str, debug: bool = _DEV_MODE, mode: str = None, watch: bool 
     public_path = assets_public_path(pkg_name)
     mode = mode or ('development' if _DEV_MODE else 'production')
 
-    # Clear destination directory
-    if _path.exists(dst):
-        _rmtree(dst)
+    # Build translations
+    if _lang.is_package_registered(pkg_name):
+        build_translations(pkg_name)
 
-    # Check existence of webpack.config
+    # Building is possible only if 'webpack.config.js' exists
     webpack_config = _path.join(src, 'webpack.config.js')
     if not _path.exists(webpack_config):
         return
 
-    # Build translations
-    if _lang.is_package_registered(pkg_name):
-        build_translations(pkg_name)
+    # Clear destination directory
+    if _path.exists(dst):
+        _rmtree(dst)
 
     webpack_parts = []
     root_dir = _reg.get('paths.root') + '/'

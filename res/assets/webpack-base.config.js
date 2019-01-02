@@ -32,7 +32,7 @@ module.exports = env => {
             rules: [
                 {
                     test: /\.m?js$/,
-                    exclude: /(node_modules|bower_components)/,
+                    exclude: /(node_modules|bower_components|npm_packages)/,
                     use: {
                         loader: 'babel-loader',
                         options: {

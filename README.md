@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.1.6 (2019-01-02)
+
+Development environment Webpack's base config issue fixed.
+
+
 ### 5.1.5 (2018-10-31)
 
 Building language translations fixed.

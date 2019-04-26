@@ -4,6 +4,12 @@
 ## Changelog
 
 
+### 5.2 (2019-04-27)
+
+Automatic NPM packages installation and assets building after plugins 
+installation.
+
+
 ### 5.1.7 (2019-04-26)
 
 Cleanup.

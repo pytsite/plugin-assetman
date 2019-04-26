@@ -6,7 +6,8 @@ __license__ = 'MIT'
 
 import subprocess as _subprocess
 import json as _json
-from typing import Dict as _Dict, List as _List, Tuple as _Tuple, Union as _Union, Optional as _Optional
+from typing import Dict as _Dict, List as _List, Tuple as _Tuple, Union as _Union, Optional as _Optional, \
+    Iterable as _Iterable
 from os import path as _path, chdir as _chdir, makedirs as _makedirs, getcwd as _getcwd, symlink as _symlink, \
     mkdir as _mkdir, listdir as _listdir
 from shutil import rmtree as _rmtree
@@ -176,6 +177,35 @@ def npm_install(packages: _Union[str, _List[str]]):
         _chdir(cwd)
 
 
+def install_npm_deps(package_names: _Union[str, _List[str]]):
+    """Install NPM packages required by locally installed plugins
+    """
+    is_dev_host = _path.isdir(_path.join(_reg.get('paths.root'), 'npm_packages'))
+
+    if isinstance(package_names, str):
+        package_names = [package_names]
+
+    # Build list of NPM packages required by plugins
+    npm_pkgs_to_install = []
+    for pkg_name in package_names:
+        # Skip package if it does not provide package.json
+        json_path = _path.join(assets_src(pkg_name), 'package.json')
+        if not _path.exists(json_path):
+            continue
+
+        # Collect dependencies
+        json = _util.load_json(json_path)
+        for name, ver in json.get('dependencies', {}).items():
+            if name.startswith('@pytsite') and is_dev_host:
+                continue
+            npm_pkg_spec = '{}@{}'.format(name, ver)
+            if npm_pkg_spec not in npm_pkgs_to_install:
+                npm_pkgs_to_install.append(npm_pkg_spec)
+
+    # Install required NPM packages
+    npm_install(npm_pkgs_to_install)
+
+
 def setup():
     """Setup assetman environment
     """
@@ -208,25 +238,8 @@ def setup():
         if not _path.exists(node_modules_pkg_dir):
             _symlink(src_dir, node_modules_pkg_dir)
 
-    # Build list of NPM packages required by plugins
-    npm_pkgs_to_install = []
-    for pkg_name in _packages:
-        # Skip plugin if it does not provide package.json
-        json_path = _path.join(assets_src(pkg_name), 'package.json')
-        if not _path.exists(json_path):
-            continue
-
-        # Collect dependencies
-        json = _util.load_json(json_path)
-        for name, ver in json.get('dependencies', {}).items():
-            if name.startswith('@pytsite') and is_dev_host:
-                continue
-            npm_pkg_spec = '{}@{}'.format(name, ver)
-            if npm_pkg_spec not in npm_pkgs_to_install:
-                npm_pkgs_to_install.append(npm_pkg_spec)
-
-    # Install required NPM packages
-    npm_install(npm_pkgs_to_install)
+    # Install NPM packages required by plugins
+    install_npm_deps(list(_packages.keys()))
 
 
 def build_translations(pkg_name: str):

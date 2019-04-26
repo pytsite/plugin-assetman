@@ -45,18 +45,18 @@ class NpmInstall(_console.Command):
 
 
 class Setup(_console.Command):
-    """assetman:setup Console Command.
+    """assetman:setup Console Command
     """
 
     @property
     def name(self) -> str:
-        """Get name of the command.
+        """Get name of the command
         """
         return 'assetman:setup'
 
     @property
     def description(self) -> str:
-        """Get description of the command.
+        """Get description of the command
         """
         return 'assetman@assetman_setup_console_command_description'
 
@@ -70,7 +70,7 @@ class Setup(_console.Command):
 
 
 class Build(_console.Command):
-    """assetman:build Console Command.
+    """assetman:build Console Command
     """
 
     def __init__(self):
@@ -83,13 +83,13 @@ class Build(_console.Command):
 
     @property
     def name(self) -> str:
-        """Get name of the command.
+        """Get name of the command
         """
         return 'assetman:build'
 
     @property
     def description(self) -> str:
-        """Get description of the command.
+        """Get description of the command
         """
         return 'assetman@assetman_build_console_command_description'
 

@@ -10,9 +10,6 @@ from ._api import register_package, url, inline_js, reset, build, build_translat
     is_package_registered, assets_src, assets_dst, on_split_location, assets_public_path, npm_install, setup, \
     resolve_package
 
-# Local imports
-from pytsite import semver as _semver
-
 
 def plugin_load():
     from os import path
@@ -20,8 +17,11 @@ def plugin_load():
     from . import _eh
 
     reg.put('paths.assets', path.join(reg.get('paths.static'), 'assets'))
+
+    plugman.on_pre_install(_eh.on_plugman_pre_install)
     plugman.on_pre_load(_eh.on_plugman_pre_load)
     on_app_load(_eh.on_app_load)
+
     _api.register_package(__name__)
 
 

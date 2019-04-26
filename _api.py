@@ -19,11 +19,11 @@ _packages = {}  # type: _Dict[str, _Tuple[str, str]]
 _inline_js = {}
 _building_translations = []
 
-_DEV_MODE = _reg.get('debug', False)
+_DEBUG = _reg.get('debug', False)
 _NODE_BIN_DIR = _path.join(_reg.get('paths.root'), 'node_modules', '.bin')
 
 
-def _run_process(cmd: list, passthrough: bool = False) -> _subprocess.CompletedProcess:
+def _run_process(cmd: list, passthrough: bool = _DEBUG) -> _subprocess.CompletedProcess:
     """Run process.
     """
     stdout = stderr = _subprocess.PIPE if not passthrough else None
@@ -31,7 +31,7 @@ def _run_process(cmd: list, passthrough: bool = False) -> _subprocess.CompletedP
     return _subprocess.run(cmd, stdout=stdout, stderr=stderr)
 
 
-def _run_node_bin(bin_name: str, args: _List[str], passthrough: bool = False) -> _subprocess.CompletedProcess:
+def _run_node_bin(bin_name: str, args: _List[str], passthrough: bool = _DEBUG) -> _subprocess.CompletedProcess:
     """Run Node's binary
     """
     cmd = ['node', _path.join(_NODE_BIN_DIR, bin_name)] + args
@@ -149,7 +149,7 @@ def url(location: str) -> str:
 def _check_npm_installation():
     """Check if the NPM is installed
     """
-    if _run_process(['which', 'npm']).returncode != 0:
+    if _run_process(['which', 'npm'], False).returncode != 0:
         raise RuntimeError('NPM executable is not found. Check https://docs.npmjs.com/getting-started/installing-node')
 
 
@@ -165,7 +165,7 @@ def npm_install(packages: _Union[str, _List[str]]):
         if isinstance(packages, str):
             packages = [packages]
 
-        r = _run_process(['npm', 'install', '--no-save', '--no-audit', '--no-package-lock'] + packages, True)
+        r = _run_process(['npm', 'install', '--no-save', '--no-audit', '--no-package-lock'] + packages)
         r.check_returncode()
 
     except _subprocess.CalledProcessError:
@@ -208,7 +208,7 @@ def setup():
         if not _path.exists(node_modules_pkg_dir):
             _symlink(src_dir, node_modules_pkg_dir)
 
-    # Install NPM packages required by plugins
+    # Build list of NPM packages required by plugins
     npm_pkgs_to_install = []
     for pkg_name in _packages:
         # Skip plugin if it does not provide package.json
@@ -225,6 +225,7 @@ def setup():
             if npm_pkg_spec not in npm_pkgs_to_install:
                 npm_pkgs_to_install.append(npm_pkg_spec)
 
+    # Install required NPM packages
     npm_install(npm_pkgs_to_install)
 
 
@@ -272,14 +273,14 @@ def build_translations(pkg_name: str):
         f.write(_json.dumps(data))
 
 
-def build(pkg_name: str, debug: bool = _DEV_MODE, mode: str = None, watch: bool = False):
+def build(pkg_name: str, debug: bool = _DEBUG, mode: str = None, watch: bool = False):
     """Compile assets
     """
     pkg_name = resolve_package(pkg_name)
     src = assets_src(pkg_name)
     dst = assets_dst(pkg_name)
     public_path = assets_public_path(pkg_name)
-    mode = mode or ('development' if _DEV_MODE else 'production')
+    mode = mode or ('development' if debug else 'production')
 
     # Build translations
     if _lang.is_package_registered(pkg_name):
@@ -317,7 +318,7 @@ def build(pkg_name: str, debug: bool = _DEV_MODE, mode: str = None, watch: bool 
     _run_node_bin('webpack-cli', args, watch or debug)
 
 
-def build_all(debug: bool = _DEV_MODE, mode: str = None):
+def build_all(debug: bool = _DEBUG, mode: str = None):
     _console.print_info(_lang.t('assetman@compiling_assets'))
 
     assets_static_path = _reg.get('paths.assets')

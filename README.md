@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.1.7 (2019-04-26)
+
+Cleanup.
+
+
 ### 5.1.6 (2019-01-02)
 
 Development environment Webpack's base config issue fixed.

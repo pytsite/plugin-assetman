@@ -56,10 +56,3 @@ def plugin_load_wsgi():
 
     router.on_dispatch(reset, -999, '*')
     router.on_xhr_dispatch(reset, -999, '*')
-
-
-def plugin_update(v_from: _semver.Version):
-    if v_from <= '2.4.3':
-        # Required NPM packages added/updated
-        from ._api import setup
-        setup()

@@ -4,13 +4,13 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from pytsite import console as _console, maintenance as _maintenance, lang as _lang, reg as _reg
+from pytsite import console, maintenance, lang, reg
 from . import _api, _error
 
-_DEV_MODE = _reg.get('debug', False)
+_DEV_MODE = reg.get('debug', False)
 
 
-class NpmInstall(_console.Command):
+class NpmInstall(console.Command):
     """npm:install Console Command.
     """
 
@@ -35,16 +35,16 @@ class NpmInstall(_console.Command):
             return
 
         try:
-            _maintenance.enable()
-            _console.print_info(_lang.t('assetman@installing_npm_packages', {'packages': ', '.join(self.args)}))
+            maintenance.enable()
+            console.print_info(lang.t('assetman@installing_npm_packages', {'packages': ', '.join(self.args)}))
             _api.npm_install(self.args)
         except RuntimeError as e:
-            raise _console.error.CommandExecutionError(e)
+            raise console.error.CommandExecutionError(e)
         finally:
-            _maintenance.disable()
+            maintenance.disable()
 
 
-class Setup(_console.Command):
+class Setup(console.Command):
     """assetman:setup Console Command
     """
 
@@ -63,23 +63,23 @@ class Setup(_console.Command):
     def exec(self):
 
         try:
-            _maintenance.enable()
+            maintenance.enable()
             _api.setup()
         finally:
-            _maintenance.disable()
+            maintenance.disable()
 
 
-class Build(_console.Command):
+class Build(console.Command):
     """assetman:build Console Command
     """
 
     def __init__(self):
         super().__init__()
 
-        self.define_option(_console.option.Str('mode', default='development' if _DEV_MODE else 'production'))
-        self.define_option(_console.option.Bool('debug', default=_DEV_MODE))
-        self.define_option(_console.option.Bool('watch'))
-        self.define_option(_console.option.Bool('no-maint'))
+        self.define_option(console.option.Str('mode', default='development' if _DEV_MODE else 'production'))
+        self.define_option(console.option.Bool('debug', default=_DEV_MODE))
+        self.define_option(console.option.Bool('watch'))
+        self.define_option(console.option.Bool('no-maint'))
 
     @property
     def name(self) -> str:
@@ -102,11 +102,11 @@ class Build(_console.Command):
         watch = self.opt('watch')
 
         if watch and not self.args:
-            raise _console.error.CommandExecutionError('--watch option must be used only with package name')
+            raise console.error.CommandExecutionError('--watch option must be used only with package name')
 
         try:
             if maint and not watch:
-                _maintenance.enable()
+                maintenance.enable()
 
             packages = self.args
             if packages:
@@ -119,11 +119,11 @@ class Build(_console.Command):
                 _api.build_all(debug, mode)
 
         except (RuntimeError, _error.PackageNotRegistered, _error.PackageAlreadyRegistered) as e:
-            raise _console.error.CommandExecutionError(e)
+            raise console.error.CommandExecutionError(e)
 
         except KeyboardInterrupt:
-            _console.print_info('')
+            console.print_info('')
 
         finally:
             if maint and not watch:
-                _maintenance.disable()
+                maintenance.disable()

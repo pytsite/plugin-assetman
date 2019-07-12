@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.3 (2019-07-12)
+
+Support of `pytsite-9.0`.
+
+
 ### 5.2 (2019-04-27)
 
 Automatic NPM packages installation and assets building after plugins 

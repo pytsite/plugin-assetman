@@ -1,6 +1,6 @@
 {
   "name": "assetman",
-  "version": "5.3",
+  "version": "5.3.1",
   "description": {
     "en": "Asset Manager",
     "ru": "Менеджер ассетов",
@@ -15,7 +15,7 @@
   "requires": {
     "pytsite": ">=9.0",
     "packages": {
-      "seamver": ">=0.1"
+      "semaver": ">=0.1"
     }
   }
 }

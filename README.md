@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.4.1 (2019-07-26)
+
+Timestamps file creation error fixed.
+
+
 ### 5.4 (2019-07-26)
 
 Build timestamps added.

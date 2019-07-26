@@ -330,11 +330,18 @@ def build(pkg_name: str, debug: bool = _DEBUG, mode: str = None, watch: bool = F
 
     _run_node_bin('webpack-cli', args, watch or debug)
 
-    # Update build timestamps
+    # Path to timestamps file
+    timestamps_path = path.join(assets_dst('assetman'), 'timestamps.json')
+
+    # Create output directory for timestamps file
+    timestamps_dir = path.dirname(timestamps_path)
+    if not path.exists(timestamps_dir):
+        makedirs(timestamps_dir, 0o755, True)
+
+    # Update timestamps
     _BUILD_TS.put(pkg_name, int(time.time()))
-    ts_json_path = path.join(assets_dst('assetman'), 'timestamps.json')
-    with open(ts_json_path, 'wt', encoding='utf-8') as f:
-        logger.debug(f"Writing timestamps into '{ts_json_path}'")
+    with open(timestamps_path, 'wt', encoding='utf-8') as f:
+        logger.debug(f"Writing timestamps into '{timestamps_path}'")
         f.write(json.dumps({k: _BUILD_TS.get(k) for k in _BUILD_TS.keys()}))
 
 

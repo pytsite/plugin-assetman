@@ -1,6 +1,8 @@
 import $ from 'jquery';
 import lang from './lang';
 
+const timestamps = require('../../../../static/assets/plugins.assetman/timestamps.json');
+
 function url(urlStr, query = {}) {
     const r = urlStr.startsWith('http') ? new URL(urlStr) : new URL(urlStr, window.location.origin);
     query = Object.assign(parseQueryString(r.search.replace(/^\?/, '')), query);
@@ -24,11 +26,14 @@ function assetUrl(urlStr) {
         assetPath = urlParts[1];
     }
 
+    if (timestamps.hasOwnProperty(pkgName))
+        assetPath += '?v=' + timestamps[pkgName];
+
     return location.origin + '/assets/' + pkgName + '/' + assetPath
 }
 
 function _loadResource(resType, resLoc, async) {
-    resLoc = assetUrl(resLoc).replace(/\?v=[0-9a-f]+/, '');
+    resLoc = assetUrl(resLoc);
 
     // Async is default for CSS but not for JS
     if (async === undefined)

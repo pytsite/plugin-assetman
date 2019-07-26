@@ -4,13 +4,14 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
+import time
 import subprocess as subprocess
-import json as _json
+import json
 from typing import Dict, List, Tuple, Union, Optional
 from os import path, chdir, makedirs, getcwd, symlink, mkdir, listdir
 from shutil import rmtree
 from importlib.util import find_spec
-from pytsite import router, threading, util, reg, console, lang, events, logger, package_info
+from pytsite import router, threading, util, reg, console, lang, events, logger, package_info, cache
 from . import _error
 
 _packages = {}  # type: Dict[str, Tuple[str, str]]
@@ -19,6 +20,7 @@ _building_translations = []
 
 _DEBUG = reg.get('debug', False)
 _NODE_BIN_DIR = path.join(reg.get('paths.root'), 'node_modules', '.bin')
+_BUILD_TS = cache.create_pool('assetman@timestapms')
 
 
 def _run_process(cmd: list, passthrough: bool = _DEBUG) -> subprocess.CompletedProcess:
@@ -140,8 +142,9 @@ def url(location: str) -> str:
 
     package_name, asset_path = _split_location(location)
     package_name = resolve_package(package_name)
+    t = _BUILD_TS.get(package_name) if _BUILD_TS.has(package_name) else 0
 
-    return router.url('/assets/{}/{}'.format(package_name, asset_path), add_lang_prefix=False)
+    return router.url(f'/assets/{package_name}/{asset_path}', query={'v': t}, add_lang_prefix=False)
 
 
 def _check_npm_installation():
@@ -280,7 +283,7 @@ def build_translations(pkg_name: str):
     # Write translations to teh file
     with open(output_file, 'wt', encoding='utf-8') as f:
         logger.debug("Writing translations into '{}'".format(output_file))
-        f.write(_json.dumps(data))
+        f.write(json.dumps(data))
 
 
 def build(pkg_name: str, debug: bool = _DEBUG, mode: str = None, watch: bool = False):
@@ -326,6 +329,13 @@ def build(pkg_name: str, debug: bool = _DEBUG, mode: str = None, watch: bool = F
     ]
 
     _run_node_bin('webpack-cli', args, watch or debug)
+
+    # Update build timestamps
+    _BUILD_TS.put(pkg_name, int(time.time()))
+    ts_json_path = path.join(assets_dst('assetman'), 'timestamps.json')
+    with open(ts_json_path, 'wt', encoding='utf-8') as f:
+        logger.debug(f"Writing timestamps into '{ts_json_path}'")
+        f.write(json.dumps({k: _BUILD_TS.get(k) for k in _BUILD_TS.keys()}))
 
 
 def build_all(debug: bool = _DEBUG, mode: str = None):

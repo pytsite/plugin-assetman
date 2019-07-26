@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.4 (2019-07-26)
+
+Build timestamps added.
+
+
 ### 5.3.1 (2019-07-13)
 
 `plugin.json` fix.

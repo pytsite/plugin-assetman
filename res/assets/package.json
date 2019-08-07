@@ -23,7 +23,7 @@
     "react-dom": "16.x",
     "sass-loader": "7.x",
     "style-loader": "0.x",
-    "uglifyjs-webpack-plugin": "2.x",
+    "terser-webpack-plugin": "1.x",
     "webpack": "4.x",
     "webpack-cli": "3.x",
     "webpack-merge": "4.x"

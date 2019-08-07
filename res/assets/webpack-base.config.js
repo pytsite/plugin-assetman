@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const webpackMerge = require('webpack-merge');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 
@@ -90,7 +90,7 @@ module.exports = env => {
         config = webpackMerge(config, {
             optimization: {
                 minimizer: [
-                    new UglifyJsPlugin({
+                    new TerserPlugin({
                         cache: true,
                         parallel: true,
                         extractComments: true,

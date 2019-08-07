@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.5 (2019-08-07)
+
+`UglifyJS` replaced with `Terser`.
+
+
 ### 5.4.1 (2019-07-26)
 
 Timestamps file creation error fixed.

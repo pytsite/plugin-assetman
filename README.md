@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.5.1 (2019-08-19)
+
+Empty timestamps file error fixed.
+
+
 ### 5.5 (2019-08-07)
 
 `UglifyJS` replaced with `Terser`.
